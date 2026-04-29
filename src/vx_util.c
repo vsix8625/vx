@@ -1,11 +1,15 @@
 #include "vx_util.h"
 #include "vx_limits.h"
+#include "vx_platform.h"
 
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
+
+#if defined(__linux__)
+#include <time.h>
+#endif
 
 vx_status vx_mkdir_p(const char *path)
 {
@@ -22,27 +26,29 @@ vx_status vx_mkdir_p(const char *path)
 
     for (char *p = tmp + 1; *p; ++p)
     {
-        if (*p == '/')
+        if (*p == '/' || *p == '\\')
         {
+            char backup = *p;
+
             *p = '\0';
 
-            if (p != tmp && mkdir(tmp, 0755) != 0 && errno != EEXIST)
+            if (p != tmp && (strlen(tmp) > 0 && tmp[len - 1] != ':'))
             {
-                vx_errlog("%s(): mkdir failed", __func__);
-                return VX_ERROR;
+                if (vx_mkdir(tmp) != 0 && errno != EEXIST)
+                {
+                    vx_errlog("%s(): mkdir failed", __func__);
+                    return VX_ERROR;
+                }
             }
 
-            *p = '/';
+            *p = backup;
         }
     }
 
-    if (tmp[len - 1] != '/')
+    if (vx_mkdir(tmp) != 0 && errno != EEXIST)
     {
-        if (mkdir(tmp, 0755) != 0 && errno != EEXIST)
-        {
-            vx_errlog("%s(): mkdir failed", __func__);
-            return VX_ERROR;
-        }
+        vx_errlog("%s(): mkdir failed", __func__);
+        return VX_ERROR;
     }
 
     return VX_OK;
@@ -69,4 +75,14 @@ char *vx_trim_s(char *s)
     }
 
     return s;
+}
+
+void vx_yield(void)
+{
+#if defined(_WIN32) || defined(_WIN64)
+    Sleep(0);
+#else
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = 100 * 100};
+    nanosleep(&ts, NULL);
+#endif
 }

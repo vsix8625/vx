@@ -2,8 +2,8 @@
 # Latest update: 2026-02-24
 
 major         = "0";
-minor         = "0";
-patch         = "2";
+minor         = "1";
+patch         = "1";
 
 TARGET        = "vx"; 
 VERSION       = "${major}.${minor}.${patch}";    
@@ -20,7 +20,7 @@ OUT_DIR       = "build/${TARGET}/${BUILD_TYPE}";
 std           = "-std=c23";          
 #CFLAGS        = "${std} -Wall -Werror -Wextra -g";
 
-opts          = "-Wall -O3 -pthread -march=native -mbmi -mlzcnt"; 
+opts          = "-Wall -O3 -march=native -mbmi -mlzcnt"; 
 extra_opts    = "-fomit-frame-pointer -fno-common";
 bug_detection = "-Wself-assign -Wunreachable-code";
 safety        = "-Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align";

@@ -5,34 +5,24 @@ static atomic_int g_vx_initialized = 0;
 
 bool vx_initialized(void)
 {
-    if (!atomic_load(&g_vx_initialized))
-    {
-        fprintf(stderr, "VX library is not initialized\n");
-        return false;
-    }
-    return true;
+    return atomic_load(&g_vx_initialized);
 }
 
 vx_status vx_init(void)
 {
     if (atomic_load(&g_vx_initialized))
     {
-        fprintf(stderr, "VX library is already initialized\n");
+        // already initialized
         return VX_ERROR;
     }
+
+    vx_io_init();
 
     atomic_store(&g_vx_initialized, 1);
     return VX_OK;
 }
 
-vx_status vx_shutdown(void)
+void vx_shutdown(void)
 {
-    if (!atomic_load(&g_vx_initialized))
-    {
-        fprintf(stderr, "VX library is not initialized\n");
-        return VX_ERROR;
-    }
-
     atomic_store(&g_vx_initialized, 0);
-    return VX_OK;
 }

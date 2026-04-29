@@ -3,10 +3,21 @@
 
 #include "vx_io.h"
 #include "vx_string.h"
+#include "vx_array.h"
 
+/*
+ * @return: `true` if initialized or `false`.
+ */
 bool vx_initialized(void);
 
+/*
+ * Initializes vx library.
+ * @return: `VX_OK` on success, `VX_ERROR` if failed.*/
 vx_status vx_init(void);
-vx_status vx_shutdown(void);
+
+/*
+ *Shutdown vx library
+ */
+void vx_shutdown(void);
 
 #endif  // VX_H_

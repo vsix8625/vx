@@ -2,9 +2,9 @@
 #pragma once
  
 #define VX_VERSION_MAJOR 0
-#define VX_VERSION_MINOR 0
-#define VX_VERSION_PATCH 2
-#define VX_VERSION_STRING "0.0.2"
+#define VX_VERSION_MINOR 1
+#define VX_VERSION_PATCH 1
+#define VX_VERSION_STRING "0.1.1"
 #define VX_BUILD_TYPE "release"
 #define VX_ROOT_PATH "/devenv/repos/vx"
-#define VX_CFLAGS "-std=c23 -Wall -O3 -pthread -march=native -mbmi -mlzcnt -fomit-frame-pointer -fno-common -Wself-assign -Wunreachable-code -Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align -Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn"
+#define VX_CFLAGS "-std=c23 -Wall -O3 -march=native -mbmi -mlzcnt -fomit-frame-pointer -fno-common -Wself-assign -Wunreachable-code -Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align -Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn"

@@ -19,7 +19,7 @@ typedef float  f32;
 typedef double f64;
 
 #define VX_SV_FMT     "%.*s"
-#define VX_SV_ARG(sv) (int) (sv).len, (sv).data
+#define VX_SV_ARG(sv) (int32_t) (sv).len, (sv).data
 
 typedef struct vx_string_view
 {
@@ -27,8 +27,12 @@ typedef struct vx_string_view
     size_t      len;
 } vx_sv;
 
-#define vx_malloc malloc
-#define vx_free   free
+#define VX_SV(s) {s, sizeof(s) - 1}
+
+#define vx_malloc  malloc
+#define vx_calloc  calloc
+#define vx_realloc realloc
+#define vx_free    free
 
 typedef enum vx_exit : i32
 {
@@ -38,9 +42,12 @@ typedef enum vx_exit : i32
 
 typedef enum vx_status : i32
 {
-    VX_OK    = 0,
-    VX_ERROR = 1,
-    VX_FATAL = 2,
+    VX_OK = 0,
+
+    VX_ERROR,
+    VX_FATAL,
+
+    VX_LIB_NOT_INITIALIZED,
 } vx_status;
 
 typedef struct vx_sbuf

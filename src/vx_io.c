@@ -1,311 +1,228 @@
 #include "vx_io.h"
 #include "vx.h"
+#include "vx_util.h"
 
 #include <stdarg.h>
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+
+typedef enum
+{
+    VX_LEVEL_PRINTF,
+    VX_LEVEL_INFO,
+    VX_LEVEL_WARN,
+    VX_LEVEL_ERROR,
+    VX_LEVEL_DEBUG,
+} vx_log_type;
+
+static const vx_sv vx_prefix_none  = VX_SV("");
+static const vx_sv vx_prefix_log   = VX_SV("\033[38;5;40m[log]: \033[0m");
+static const vx_sv vx_prefix_warn  = VX_SV("\033[38;5;202m[warning]: \033[0m");
+static const vx_sv vx_prefix_error = VX_SV("\033[38;5;160m[error]: \033[0m");
+static const vx_sv vx_prefix_debug = VX_SV("\033[38;5;167m[debug]: \033[0m");
+
+static const vx_sv vx_plain_log   = VX_SV("[log]: ");
+static const vx_sv vx_plain_warn  = VX_SV("[warning]: ");
+static const vx_sv vx_plain_error = VX_SV("[error]: ");
+static const vx_sv vx_plain_debug = VX_SV("[debug]: ");
 
 static atomic_flag g_io_atomic_lock     = ATOMIC_FLAG_INIT;
 static atomic_flag g_fwrite_atomic_lock = ATOMIC_FLAG_INIT;
 
-static struct timespec g_io_ts = {.tv_sec = 0, .tv_nsec = 100 * 100};
+static i32 g_stdout_tty = -1;
+static i32 g_stderr_tty = -1;
 
-void vx_printf(const char *fmt, ...)
+static inline bool vx_is_tty(i32 fd)
 {
-    if (!vx_initialized())
+    if (fd == STDOUT_FILENO)
+    {
+        if (g_stdout_tty == -1)
+        {
+            g_stdout_tty = vx_isatty(fd);
+            return g_stdout_tty;
+        }
+    }
+
+    if (fd == STDERR_FILENO)
+    {
+        if (g_stdout_tty == -1)
+        {
+            g_stderr_tty = vx_isatty(fd);
+            return g_stderr_tty;
+        }
+    }
+
+    return vx_isatty(fd);
+}
+
+static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
+{
+    if (!vx_initialized() || fmt == NULL)
     {
         return;
     }
 
-    if (fmt == NULL)
+    i32 fd = STDOUT_FILENO;
+
+    if (type != VX_LEVEL_PRINTF)
     {
-        return;
+        fd = STDERR_FILENO;
     }
+
+    bool use_color = (vx_is_tty(fd) != 0);
+
+    vx_sv prefix = vx_prefix_none;
+    if (use_color)
+    {
+        switch (type)
+        {
+            case VX_LEVEL_INFO:
+            {
+                prefix = vx_prefix_log;
+                break;
+            }
+
+            case VX_LEVEL_WARN:
+            {
+                prefix = vx_prefix_warn;
+                break;
+            }
+
+            case VX_LEVEL_ERROR:
+            {
+                prefix = vx_prefix_error;
+                break;
+            }
+
+            case VX_LEVEL_DEBUG:
+            {
+                prefix = vx_prefix_debug;
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        switch (type)
+        {
+            case VX_LEVEL_INFO:
+            {
+                prefix = vx_plain_log;
+                break;
+            }
+
+            case VX_LEVEL_WARN:
+            {
+                prefix = vx_plain_warn;
+                break;
+            }
+
+            case VX_LEVEL_ERROR:
+            {
+                prefix = vx_plain_error;
+                break;
+            }
+
+            case VX_LEVEL_DEBUG:
+            {
+                prefix = vx_plain_debug;
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+    // end of setup
 
     while (atomic_flag_test_and_set(&g_io_atomic_lock))
     {
-        nanosleep(&g_io_ts, NULL);
+        vx_yield();
     }
 
     char buf[VX_PATH_MAX];
+    memcpy(buf, prefix.data, prefix.len);
 
+    va_list aq;
+    va_copy(aq, args);
+    i32 msg_len = vsnprintf(buf + prefix.len, sizeof(buf) - prefix.len - 1, fmt, aq);
+    va_end(aq);
+
+    if (msg_len < 0)
+    {
+        atomic_flag_clear(&g_io_atomic_lock);
+        return;
+    }
+
+    size_t total_len = prefix.len + (size_t) msg_len;
+
+    if (total_len < sizeof(buf) - 1)
+    {
+        if (type != VX_LEVEL_PRINTF)
+            buf[total_len++] = '\n';
+        vx_write(fd, buf, total_len);
+    }
+    else
+    {
+        char *big = vx_malloc(total_len + 2);
+        if (big)
+        {
+            memcpy(big, prefix.data, prefix.len);
+            vsnprintf(big + prefix.len, (size_t) msg_len + 1, fmt, args);
+
+            if (type != VX_LEVEL_PRINTF)
+            {
+                big[total_len] = '\n';
+                total_len++;
+            }
+
+            vx_write(fd, big, total_len);
+            vx_free(big);
+        }
+    }
+
+    atomic_flag_clear(&g_io_atomic_lock);
+}
+
+void vx_printf(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
-    i32 len = vsnprintf(buf, sizeof(buf), fmt, args);
+    vx_log_core(VX_LEVEL_PRINTF, fmt, args);
     va_end(args);
-
-    if (len < 0)
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    if (len < (i32) sizeof(buf))
-    {
-        write(STDOUT_FILENO, buf, (size_t) len);
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    char *big = vx_malloc((size_t) len + 1);
-
-    if (big == NULL)
-    {
-        char errbuf[256];
-        i32  errlen = snprintf(errbuf,
-                               sizeof(errbuf),
-                               "%s():%d: failed to allocate memory for buffer",
-                               __func__,
-                               __LINE__);
-        if (errlen > 0)
-        {
-            write(STDERR_FILENO,
-                  errbuf,
-                  (errlen < (int) sizeof(errbuf)) ? (size_t) errlen : sizeof(errbuf) - 1);
-        }
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    va_start(args, fmt);
-    vsnprintf(big, (size_t) len + 1, fmt, args);
-    va_end(args);
-
-    write(STDOUT_FILENO, big, (size_t) len);
-
-    vx_free(big);
-    atomic_flag_clear(&g_io_atomic_lock);
 }
 
 void vx_warn(const char *fmt, ...)
 {
-    if (!vx_initialized())
-    {
-        return;
-    }
-
-    if (fmt == NULL)
-    {
-        return;
-    }
-
-    while (atomic_flag_test_and_set(&g_io_atomic_lock))
-    {
-        nanosleep(&g_io_ts, NULL);
-    }
-
-    const char *prefix = "\033[38;5;202m[warning]: \033[0m";
-
-    char buf[VX_PATH_MAX];
-
-    i32 prefix_len = snprintf(buf, sizeof(buf), "%s", prefix);
-
-    if (prefix_len < 0 || prefix_len >= (i32) sizeof(buf))
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
     va_list args;
     va_start(args, fmt);
-    i32 msg_len = vsnprintf(buf + prefix_len, sizeof(buf) - (size_t) prefix_len, fmt, args);
+    vx_log_core(VX_LEVEL_WARN, fmt, args);
     va_end(args);
-
-    if (msg_len < 0)
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    i32 total_len = prefix_len + msg_len;
-
-    i32 fd = STDERR_FILENO;
-
-    if (total_len < (i32) sizeof(buf))
-    {
-        buf[total_len] = '\n';
-        write(fd, buf, (size_t) total_len + 1);
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    // fallback if large
-    char *big = vx_malloc((size_t) total_len + 1);
-
-    if (big == NULL)
-    {
-        const char *oom = "[warning]: out of memory while formatting warning msg\n";
-        write(fd, oom, strlen(oom));
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    memcpy(big, prefix, (size_t) prefix_len);
-
-    va_start(args, fmt);
-    vsnprintf(big + prefix_len, (size_t) msg_len + 1, fmt, args);
-    va_end(args);
-
-    big[total_len] = '\n';
-    write(fd, big, (size_t) total_len + 1);
-
-    vx_free(big);
-    atomic_flag_clear(&g_io_atomic_lock);
 }
 
 void vx_errlog(const char *fmt, ...)
 {
-    if (!vx_initialized())
-    {
-        return;
-    }
-
-    if (fmt == NULL)
-    {
-        return;
-    }
-
-    while (atomic_flag_test_and_set(&g_io_atomic_lock))
-    {
-        nanosleep(&g_io_ts, NULL);
-    }
-
-    const char *prefix = "\033[38;5;160m[error]: \033[0m";
-
-    char buf[VX_PATH_MAX];
-
-    i32 prefix_len = snprintf(buf, sizeof(buf), "%s", prefix);
-
-    if (prefix_len < 0 || prefix_len >= (i32) sizeof(buf))
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
     va_list args;
     va_start(args, fmt);
-    i32 msg_len = vsnprintf(buf + prefix_len, sizeof(buf) - (size_t) prefix_len, fmt, args);
+    vx_log_core(VX_LEVEL_ERROR, fmt, args);
     va_end(args);
-
-    if (msg_len < 0)
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    i32 total_len = prefix_len + msg_len;
-
-    i32 fd = STDERR_FILENO;
-
-    if (total_len < (i32) sizeof(buf))
-    {
-        buf[total_len] = '\n';
-        write(fd, buf, (size_t) total_len + 1);
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    // fallback if large
-    char *big = vx_malloc((size_t) total_len + 1);
-
-    if (big == NULL)
-    {
-        const char *oom = "[error]: out of memory while formatting error\n";
-        write(fd, oom, strlen(oom));
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    memcpy(big, prefix, (size_t) prefix_len);
-
-    va_start(args, fmt);
-    vsnprintf(big + prefix_len, (size_t) msg_len + 1, fmt, args);
-    va_end(args);
-
-    big[total_len] = '\n';
-    write(fd, big, (size_t) total_len + 1);
-
-    vx_free(big);
-    atomic_flag_clear(&g_io_atomic_lock);
 }
 
 void vx_log(const char *fmt, ...)
 {
-    if (!vx_initialized())
-    {
-        return;
-    }
-
-    if (fmt == NULL)
-    {
-        return;
-    }
-
-    while (atomic_flag_test_and_set(&g_io_atomic_lock))
-    {
-        nanosleep(&g_io_ts, NULL);
-    }
-
-    const char *prefix = "\033[38;5;40m[log]: \033[0m";
-
-    char buf[VX_PATH_MAX];
-
-    i32 prefix_len = snprintf(buf, sizeof(buf), "%s", prefix);
-
-    if (prefix_len < 0 || prefix_len >= (i32) sizeof(buf))
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
     va_list args;
     va_start(args, fmt);
-    i32 msg_len = vsnprintf(buf + prefix_len, sizeof(buf) - (size_t) prefix_len, fmt, args);
+    vx_log_core(VX_LEVEL_INFO, fmt, args);
     va_end(args);
-
-    if (msg_len < 0)
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    i32 total_len = prefix_len + msg_len;
-
-    i32 fd = STDERR_FILENO;
-
-    if (total_len < (i32) sizeof(buf))
-    {
-        buf[total_len] = '\n';
-        write(fd, buf, (size_t) total_len + 1);
-
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    // fallback if large
-    char *big = vx_malloc((size_t) total_len + 1);
-
-    if (big == NULL)
-    {
-        const char *oom = "[log]: out of memory while formatting debug log\n";
-        write(fd, oom, strlen(oom));
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
-
-    memcpy(big, prefix, (size_t) prefix_len);
-
-    va_start(args, fmt);
-    vsnprintf(big + prefix_len, (size_t) msg_len + 1, fmt, args);
-    va_end(args);
-
-    big[total_len] = '\n';
-    write(fd, big, (size_t) total_len + 1);
-
-    vx_free(big);
-    atomic_flag_clear(&g_io_atomic_lock);
 }
 
 static bool g_vx_set_debug = false;
@@ -317,91 +234,34 @@ void vx_set_debug(bool enabled)
 
 void vx_dbglog(const char *fmt, ...)
 {
-    if (!vx_initialized())
+    if (g_vx_set_debug == false)
     {
         return;
     }
 
-    if (g_vx_set_debug)
-    {
-        if (fmt == NULL)
-        {
-            return;
-        }
-
-        while (atomic_flag_test_and_set(&g_io_atomic_lock))
-        {
-            nanosleep(&g_io_ts, NULL);
-        }
-
-        const char *prefix = "\033[38;5;167m[debug]: \033[0m";
-
-        char buf[VX_PATH_MAX];
-
-        i32 prefix_len = snprintf(buf, sizeof(buf), "%s", prefix);
-
-        if (prefix_len < 0 || prefix_len >= (i32) sizeof(buf))
-        {
-            atomic_flag_clear(&g_io_atomic_lock);
-            return;
-        }
-
-        va_list args;
-        va_start(args, fmt);
-        i32 msg_len = vsnprintf(buf + prefix_len, sizeof(buf) - (size_t) prefix_len, fmt, args);
-        va_end(args);
-
-        if (msg_len < 0)
-        {
-            atomic_flag_clear(&g_io_atomic_lock);
-            return;
-        }
-
-        i32 total_len = prefix_len + msg_len;
-
-        i32 fd = STDERR_FILENO;
-
-        if (total_len < (i32) sizeof(buf))
-        {
-            buf[total_len] = '\n';
-            write(fd, buf, (size_t) total_len + 1);
-
-            atomic_flag_clear(&g_io_atomic_lock);
-            return;
-        }
-
-        // fallback if large
-        char *big = vx_malloc((size_t) total_len + 1);
-
-        if (big == NULL)
-        {
-            const char *oom = "[debug]: out of memory while formatting debug log\n";
-            write(fd, oom, strlen(oom));
-            atomic_flag_clear(&g_io_atomic_lock);
-            return;
-        }
-
-        memcpy(big, prefix, (size_t) prefix_len);
-
-        va_start(args, fmt);
-        vsnprintf(big + prefix_len, (size_t) msg_len + 1, fmt, args);
-        va_end(args);
-
-        big[total_len] = '\n';
-        write(fd, big, (size_t) total_len + 1);
-
-        vx_free(big);
-        atomic_flag_clear(&g_io_atomic_lock);
-    }
+    va_list args;
+    va_start(args, fmt);
+    vx_log_core(VX_LEVEL_DEBUG, fmt, args);
+    va_end(args);
 }
 
 //----------------------------------------------------------------------------------------------------
 
 vx_status vx_fwrite(const char *path, const char *fmt, ...)
 {
+    if (!vx_initialized())
+    {
+        return VX_LIB_NOT_INITIALIZED;
+    }
+
+    if (path == NULL || fmt == NULL)
+    {
+        return VX_ERROR;
+    }
+
     while (atomic_flag_test_and_set(&g_fwrite_atomic_lock))
     {
-        nanosleep(&g_io_ts, NULL);
+        vx_yield();
     }
 
     FILE *fp = fopen(path, "w");
@@ -424,9 +284,14 @@ vx_status vx_fwrite(const char *path, const char *fmt, ...)
 
 vx_status vx_fappend(const char *path, const char *fmt, ...)
 {
+    if (!vx_initialized())
+    {
+        return VX_LIB_NOT_INITIALIZED;
+    }
+
     while (atomic_flag_test_and_set(&g_fwrite_atomic_lock))
     {
-        nanosleep(&g_io_ts, NULL);
+        vx_yield();
     }
 
     FILE *fp = fopen(path, "a");
@@ -449,6 +314,11 @@ vx_status vx_fappend(const char *path, const char *fmt, ...)
 
 void vx_sbuf_append(vx_sbuf *buf, const char *fmt, ...)
 {
+    if (!vx_initialized())
+    {
+        return;
+    }
+
     if (buf == nullptr || buf->offset >= buf->size)
     {
         return;

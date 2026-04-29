@@ -9,4 +9,6 @@ vx_status vx_mkdir_p(const char *path);
 
 char *vx_trim_s(char *s);
 
+void vx_yield(void);
+
 #endif  // VX_UTIL_H_
