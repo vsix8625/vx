@@ -4,6 +4,7 @@
 #include "vx_io.h"
 #include "vx_string.h"
 #include "vx_array.h"
+#include "vx_config.h"
 
 /*
  * @return: `true` if initialized or `false`.

@@ -65,7 +65,7 @@ void vx_array_push(vx_array *arr, void *element)
     {
         if (arr->capacity > (VX_MAX_ARRAY))
         {
-            VX_ASSERT_LOG("Array reached absolute maximum capacity");
+            VX_ASSERT_LOG("Array reached maximum capacity");
             return;
         }
 

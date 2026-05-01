@@ -33,6 +33,9 @@ static atomic_flag g_fwrite_atomic_lock = ATOMIC_FLAG_INIT;
 static i32 g_stdout_tty = -1;
 static i32 g_stderr_tty = -1;
 
+static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
+    __attribute__((format(__printf__, 2, 0)));
+
 static inline bool vx_is_tty(i32 fd)
 {
     if (fd == STDOUT_FILENO)
