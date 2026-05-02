@@ -2,6 +2,7 @@
 #define LIMITS_H_
 
 #define VX_SIZE_MAX ((size_t) -1)
+#define VX_PATH_MAX (8192)
 
 // BUFFER SIZES
 #define VX_BUF_SIZE_16   (1 << 4)

@@ -49,13 +49,13 @@
 
 #if defined(_WIN32) || defined(_WIN64)
     #define VX_OS_WINDOWS 1
-    #define VX_PATH_MAX   (512)
 #elif defined(__APPLE__) || defined(__MACH__)
     #define VX_OS_MACOS 1
-    #define VX_PATH_MAX (1024)
+    #error "macOS not supported"
 #elif defined(__linux__) || defined(__linux)
     #define VX_OS_LINUX 1
-    #define VX_PATH_MAX (4096)
+#else
+    #error "Unsupported platform"
 #endif
 
 #ifndef VX_API

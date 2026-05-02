@@ -3,7 +3,7 @@
 
 major         = "0";
 minor         = "1";
-patch         = "4";
+patch         = "5";
 
 TARGET        = "vx"; 
 VERSION       = "${major}.${minor}.${patch}";    
@@ -20,16 +20,16 @@ OUT_DIR       = "build/${TARGET}/${BUILD_TYPE}";
 std           = "-std=c23";          
 #CFLAGS        = "${std} -Wall -Werror -Wextra -g";
 
-opts          = "-Wall -O3 -march=native -mbmi -mlzcnt"; 
+opts          = "-Wall -O3 -march=native -mbmi -mlzcnt -pthread"; 
 extra_opts    = "-fomit-frame-pointer -fno-common";
 bug_detection = "-Wself-assign -Wunreachable-code";
 safety        = "-Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align";
 quality       = "-Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn";
 CFLAGS_RELEASE = "${std} ${opts} ${extra_opts} ${bug_detection} ${safety} ${quality}";
 
-DEFINES       = "-DNDEBUG";
+DEFINES       = "-DNDEBUG -DVX_USE_THREADS";
 
-#LFLAGS      = "";     
+LFLAGS      = "-lpthread";     
 # LIB_PATHS   = "-L/usr/local/lib";
 
 GEN_COMPILE_COMMANDS = "on";

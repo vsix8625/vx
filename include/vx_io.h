@@ -1,15 +1,15 @@
 #pragma GCC system_header
 #ifndef IO_H_
-#define IO_H_
+    #define IO_H_
 
-#include "vx_limits.h"
-#include "vx_defs.h"
-#include "vx_platform.h"
+    #include "vx_limits.h"
+    #include "vx_defs.h"
+    #include "vx_platform.h"
 
-#include <sys/stat.h>
-#include <stdio.h>
+    #include <sys/stat.h>
+    #include <stdio.h>
 
-#define VA_CHECK(fmt_arg_n) __attribute__((format(__printf__, fmt_arg_n, fmt_arg_n + 1)))
+    #define VA_CHECK(fmt_arg_n) __attribute__((format(__printf__, fmt_arg_n, fmt_arg_n + 1)))
 
 VX_API void vx_printf(const char *fmt, ...) VA_CHECK(1);
 VX_API void vx_warn(const char *fmt, ...) VA_CHECK(1);
@@ -69,6 +69,7 @@ static inline bool vx_isdir(const char *path)
 static inline bool vx_isfile(const char *path)
 {
     FILE *f = fopen(path, "r");
+
     if (f)
     {
         fclose(f);
@@ -94,16 +95,16 @@ static inline const char *vx_getcwd_fn(void)
 
 //----------------------------------------------------------------------------------------------------
 
-#define VX_LOAD_CHECK() vx_printf("Hello, from VX\n")
+    #define VX_LOAD_CHECK() vx_printf("Hello, from VX\n")
 
-#define VX_ASSERT_LOG(msg, ...)                                                                    \
-    do                                                                                             \
-    {                                                                                              \
-        vx_errlog("In --> %s:%d(%s)\n          \u2514\u2500\u2500" msg,                            \
-                  __FILE__,                                                                        \
-                  __LINE__,                                                                        \
-                  __func__,                                                                        \
-                  ##__VA_ARGS__);                                                                  \
-    } while (0)
+    #define VX_ASSERT_LOG(msg, ...)                                                                \
+        do                                                                                         \
+        {                                                                                          \
+            vx_errlog("In --> %s:%d(%s)\n          \u2514\u2500\u2500" msg,                        \
+                      __FILE__,                                                                    \
+                      __LINE__,                                                                    \
+                      __func__,                                                                    \
+                      ##__VA_ARGS__);                                                              \
+        } while (0)
 
 #endif  // IO_H_

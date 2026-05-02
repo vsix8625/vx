@@ -9,7 +9,7 @@ VX_API void vx_init_time(void);
 /*
  * Get the number of nanoseconds since vx library initialization
  */
-VX_API u64 vx_timeNS(void);
+VX_API u64 vx_time_ns(void);
 
 /*
  * Get the number of microseconds since vx library initialization
@@ -19,17 +19,17 @@ VX_API u64 vx_time_micro(void);
 /*
  * Get the number of millieseconds since vx library initialization
  */
-VX_API u64 vx_timeMS(void);
+VX_API u64 vx_time_ms(void);
 
 /*
  * Get the number of seconds (`float`) since vx library initialization.
  */
-VX_API f32 vx_timef(void);
+VX_API f32 vx_time_f32(void);
 
 /*
  * Get the number of seconds (`double`) since vx library initialization.
  */
-VX_API f64 vx_timef64(void);
+VX_API f64 vx_time_f64(void);
 
 /*
  * Converts the duration between the start and end ticks into a human-readable string.

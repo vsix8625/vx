@@ -268,6 +268,7 @@ vx_status vx_fwrite(const char *path, const char *fmt, ...)
     }
 
     FILE *fp = fopen(path, "w");
+
     if (!fp)
     {
         vx_errlog("Failed to open: %s", path);
