@@ -5,6 +5,7 @@
 #include "vx_string.h"
 #include "vx_array.h"
 #include "vx_config.h"
+#include "vx_time.h"
 
 /*
  * @return: `true` if initialized or `false`.

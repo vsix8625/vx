@@ -4,6 +4,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
 #include <direct.h>
+#include <windows.h>
 
 #define vx_write       _write
 #define vx_getcwd      _getcwd

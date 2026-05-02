@@ -17,6 +17,7 @@ vx_status vx_init(void)
     }
 
     vx_io_init();
+    vx_init_time();
 
     atomic_store(&g_vx_initialized, 1);
     return VX_OK;
