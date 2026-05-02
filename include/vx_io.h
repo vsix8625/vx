@@ -11,30 +11,30 @@
 
 #define VA_CHECK(fmt_arg_n) __attribute__((format(__printf__, fmt_arg_n, fmt_arg_n + 1)))
 
-void vx_printf(const char *fmt, ...) VA_CHECK(1);
-void vx_warn(const char *fmt, ...) VA_CHECK(1);
-void vx_errlog(const char *fmt, ...) VA_CHECK(1);
-void vx_log(const char *fmt, ...) VA_CHECK(1);
+VX_API void vx_printf(const char *fmt, ...) VA_CHECK(1);
+VX_API void vx_warn(const char *fmt, ...) VA_CHECK(1);
+VX_API void vx_errlog(const char *fmt, ...) VA_CHECK(1);
+VX_API void vx_log(const char *fmt, ...) VA_CHECK(1);
 
 /*
  * Set debug output for `vx_dbglog` function.
  * @default: false.
  */
-void vx_set_debug(bool enabled);
+VX_API void vx_set_debug(bool enabled);
 
-void vx_dbglog(const char *fmt, ...) VA_CHECK(1);
+VX_API void vx_dbglog(const char *fmt, ...) VA_CHECK(1);
 
 //----------------------------------------------------------------------------------------------------
 
 /* Write formatted output to a file at `path`. Thread-safe via spinlock.
  * @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written.
  */
-vx_status vx_fwrite(const char *path, const char *fmt, ...) VA_CHECK(2);
+VX_API vx_status vx_fwrite(const char *path, const char *fmt, ...) VA_CHECK(2);
 
 /* Append formatted output to a file at `path`. Thread-safe via spinlock.
  * @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written.
  */
-vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
+VX_API vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
 
 /*
  *
@@ -46,7 +46,7 @@ vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
  *                         .offset = 0
  *                       };
  */
-void vx_sbuf_append(struct vx_sbuf *buf, const char *fmt, ...) VA_CHECK(2);
+VX_API void vx_sbuf_append(struct vx_sbuf *buf, const char *fmt, ...) VA_CHECK(2);
 
 //----------------------------------------------------------------------------------------------------
 

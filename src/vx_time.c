@@ -1,5 +1,4 @@
 #include "vx_time.h"
-#include "vx_platform.h"
 #include <stdio.h>
 
 // if windows, vx_platform includes <windows.h>

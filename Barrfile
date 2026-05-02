@@ -3,7 +3,7 @@
 
 major         = "0";
 minor         = "1";
-patch         = "3";
+patch         = "4";
 
 TARGET        = "vx"; 
 VERSION       = "${major}.${minor}.${patch}";    
@@ -27,7 +27,7 @@ safety        = "-Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align";
 quality       = "-Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn";
 CFLAGS_RELEASE = "${std} ${opts} ${extra_opts} ${bug_detection} ${safety} ${quality}";
 
-DEFINES       = "-DNDEBUG -D_GNU_SOURCE";
+DEFINES       = "-DNDEBUG";
 
 #LFLAGS      = "";     
 # LIB_PATHS   = "-L/usr/local/lib";

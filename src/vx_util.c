@@ -1,6 +1,6 @@
+#include "vx_platform.h"
 #include "vx_util.h"
 #include "vx_limits.h"
-#include "vx_platform.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -8,7 +8,7 @@
 #include <string.h>
 
 #if defined(__linux__)
-#include <time.h>
+    #include <time.h>
 #endif
 
 vx_status vx_mkdir_p(const char *path)
