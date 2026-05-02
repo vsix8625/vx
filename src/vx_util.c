@@ -24,7 +24,18 @@ vx_status vx_mkdir_p(const char *path)
     memcpy(tmp, path, len);
     tmp[len] = '\0';
 
-    for (char *p = tmp + 1; *p; ++p)
+    char *p = tmp;
+
+    if (len > 2 && tmp[1] == ':')
+    {
+        p = tmp + 3;  // start after 'C:\'
+    }
+    else if (tmp[0] == '/' || tmp[0] == '\\')
+    {
+        p = tmp + 1;
+    }
+
+    for (; *p; ++p)
     {
         if (*p == '/' || *p == '\\')
         {
@@ -32,12 +43,16 @@ vx_status vx_mkdir_p(const char *path)
 
             *p = '\0';
 
-            if (p != tmp && (strlen(tmp) > 0 && tmp[len - 1] != ':'))
+            if (strlen(tmp) > 0)
             {
                 if (vx_mkdir(tmp) != 0 && errno != EEXIST)
                 {
-                    vx_errlog("%s(): mkdir failed", __func__);
-                    return VX_ERROR;
+                    vx_stat_struct st;
+                    if (vx_stat(tmp, &st) != 0 || !S_ISDIR(st.st_mode))
+                    {
+                        vx_errlog("%s(): mkdir failed at: '%s'", __func__, tmp);
+                        return VX_ERROR;
+                    }
                 }
             }
 
@@ -47,8 +62,12 @@ vx_status vx_mkdir_p(const char *path)
 
     if (vx_mkdir(tmp) != 0 && errno != EEXIST)
     {
-        vx_errlog("%s(): mkdir failed", __func__);
-        return VX_ERROR;
+        vx_stat_struct st;
+        if (vx_stat(tmp, &st) != 0 || !S_ISDIR(st.st_mode))
+        {
+            vx_errlog("%s(): mkdir failed at: '%s'", __func__, tmp);
+            return VX_ERROR;
+        }
     }
 
     return VX_OK;

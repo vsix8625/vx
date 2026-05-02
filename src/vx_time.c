@@ -1,5 +1,6 @@
 #include "vx_time.h"
 #include "vx_platform.h"
+#include <stdio.h>
 
 // if windows, vx_platform includes <windows.h>
 #if defined(VX_OS_MACOS)
@@ -70,4 +71,50 @@ f32 vx_timef(void)
 f64 vx_timef64(void)
 {
     return (f64) vx_timeNS() / 1000000000.0;
+}
+
+void vx_ticks_start(vx_ticks *t)
+{
+    t->start = vx_timeNS();
+    t->end   = 0;
+}
+
+void vx_ticks_end(vx_ticks *t)
+{
+    t->end = vx_timeNS();
+}
+
+char *vx_ticks_format(const vx_ticks *ticks, char *buf, size_t buf_size)
+{
+    if (ticks == nullptr || buf == nullptr || buf_size == 0)
+    {
+        snprintf(buf, buf_size, "N/A");
+        return buf;
+    }
+
+    u64 diff = ticks->end - ticks->start;
+    f64 ns   = (f64) diff;
+
+    if (diff < 1000ULL)
+    {
+        snprintf(buf, buf_size, "%llu ns", (unsigned long long) diff);
+    }
+    else if (diff < 1000000ULL)
+    {
+        snprintf(buf, buf_size, "%.2f us", ns / 1000.0);
+    }
+    else if (diff < 1000000000ULL)
+    {
+        snprintf(buf, buf_size, "%.2f ms", ns / 1000000.0);
+    }
+    else if (diff < 60000000000ULL)
+    {
+        snprintf(buf, buf_size, "%.3f s", ns / 1000000000.0);
+    }
+    else
+    {
+        snprintf(buf, buf_size, "%.2f min", ns / 60000000000.0);
+    }
+
+    return buf;
 }

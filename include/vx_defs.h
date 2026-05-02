@@ -69,4 +69,10 @@ typedef struct vx_sbuf
 #endif
 #endif
 
+typedef struct vx_ticks
+{
+    u64 start;
+    u64 end;
+} vx_ticks;
+
 #endif  // DEFS_H_
