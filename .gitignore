@@ -3,6 +3,7 @@
 *.d
 
 build/
+Barrfile
 
 # Object files
 *.o

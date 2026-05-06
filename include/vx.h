@@ -7,6 +7,7 @@
 #include "vx_config.h"
 #include "vx_time.h"
 #include "vx_util.h"
+#include "vx_fs.h"
 
 /*
  * @return: `true` if initialized or `false`.
