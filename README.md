@@ -1,2 +1,2 @@
 # vx
-Personal C foundation enviroment
+Personal C foundation environment

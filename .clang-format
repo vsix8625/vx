@@ -1,0 +1,69 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Core
+IndentPPDirectives: BeforeHash
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+ContinuationIndentWidth: 4
+
+
+BreakBeforeBraces: Allman
+BraceWrapping:
+  AfterCaseLabel:        true  
+  AfterControlStatement: false
+  AfterFunction:         true  
+  AfterStruct:           true
+  AfterClass:            true
+  AfterEnum:             true
+  BeforeCatch:           true
+  BeforeElse:            true
+
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false 
+  AcrossComments: false
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false 
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false 
+  AcrossComments: false 
+
+AllowShortFunctionsOnASingleLine: None     
+AllowShortIfStatementsOnASingleLine: false  
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInContainerLiterals: true
+SpaceAfterCStyleCast: true
+SpacesBeforeTrailingComments: 2
+ReflowComments: true
+AlignTrailingComments: true
+AlignOperands: Align
+AlignAfterOpenBracket: Align
+
+BinPackArguments: false
+BinPackParameters: false
+
+IndentCaseLabels: true
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+SortIncludes: false  
+---
+
