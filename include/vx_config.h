@@ -3,8 +3,8 @@
  
 #define VX_VERSION_MAJOR 0
 #define VX_VERSION_MINOR 1
-#define VX_VERSION_PATCH 5
-#define VX_VERSION_STRING "0.1.5"
+#define VX_VERSION_PATCH 6
+#define VX_VERSION_STRING "0.1.6"
 #define VX_BUILD_TYPE "release"
 #define VX_ROOT_PATH "/devenv/repos/vx"
-#define VX_CFLAGS "-std=c23 -Wall -O3 -march=native -mbmi -mlzcnt -pthread -fomit-frame-pointer -fno-common -Wself-assign -Wunreachable-code -Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align -Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn"
+#define VX_CFLAGS "-std=c23 -Wall -O3 -march=native -mbmi -mlzcnt -pthread -fomit-frame-pointer -fno-common -Wself-assign -Wunreachable-code -Wloop-analysis -Wthread-safety-pointer -Wvla -Wcast-align -fvisibility=hidden -Wdocumentation -Wunicode-whitespace -Wredundant-decls -Wmissing-noreturn"

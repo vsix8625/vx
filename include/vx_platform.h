@@ -45,6 +45,7 @@
 
     #define VX_FILENO fileno
     #define VX_DEVNUL "/dev/null"
+
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
