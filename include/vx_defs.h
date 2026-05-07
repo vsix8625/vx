@@ -62,11 +62,11 @@ typedef struct vx_sbuf
 #define VX_INTERNAL __attribute__((visibility("hidden")))
 
 #if !defined(__cplusplus)
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
-#ifndef nullptr
-#define nullptr ((void *) 0)
-#endif
-#endif
+    #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+        #ifndef nullptr
+            #define nullptr ((void *) 0)
+        #endif
+    #endif
 #endif
 
 typedef struct vx_ticks
@@ -74,5 +74,7 @@ typedef struct vx_ticks
     u64 start;
     u64 end;
 } vx_ticks;
+
+static_assert(sizeof(void *) == 8);
 
 #endif  // DEFS_H_

@@ -1,6 +1,6 @@
 #include "vx_fs.h"
 
-#if defined(VX_OS_LINUX)
+#if defined(VX_OS_LINUX) && defined(VX_USE_THREADS)
 
     #include <stdio.h>
     #include <stdlib.h>

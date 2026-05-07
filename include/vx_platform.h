@@ -5,17 +5,20 @@
     #include <io.h>
     #include <direct.h>
     #include <windows.h>
+
     #define vx_write       _write
     #define vx_getcwd      _getcwd
     #define vx_mkdir(dir)  _mkdir((dir))
     #define vx_isatty      _isatty
     #define vx_stat        _stat
     #define vx_stat_struct struct _stat
+    #define vx_chdir       _chdir
 
     #define STDOUT_FILENO 1
     #define STDERR_FILENO 2
-    #define VX_FILENO     _fileno
-    #define VX_DEVNUL     "nul"
+
+    #define VX_FILENO _fileno
+    #define VX_DEVNUL "nul"
 
     #define VX_PATH_SEP     '\\'
     #define VX_PATH_SEP_STR "\\"
@@ -34,12 +37,14 @@
     #include <sys/stat.h>
     #include <sys/types.h>
 
-    #define vx_write        write
-    #define vx_getcwd       getcwd
-    #define vx_mkdir(dir)   mkdir((dir), 0755)
-    #define vx_stat         stat
-    #define vx_stat_struct  struct stat
-    #define vx_isatty       isatty
+    #define vx_write       write
+    #define vx_getcwd      getcwd
+    #define vx_mkdir(dir)  mkdir((dir), 0755)
+    #define vx_stat        stat
+    #define vx_stat_struct struct stat
+    #define vx_chdir       chdir
+    #define vx_isatty      isatty
+
     #define VX_PATH_SEP     '/'
     #define VX_PATH_SEP_STR "/"
 

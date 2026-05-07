@@ -61,7 +61,7 @@ static inline bool vx_is_tty(i32 fd)
 
 static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 {
-    if (!vx_initialized() || fmt == NULL)
+    if (!vx_initialized() || fmt == nullptr)
     {
         return;
     }
@@ -171,16 +171,23 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
     if (total_len < sizeof(buf) - 1)
     {
         if (type != VX_LEVEL_PRINTF)
+        {
             buf[total_len++] = '\n';
+        }
         vx_write(fd, buf, total_len);
     }
     else
     {
         char *big = vx_malloc(total_len + 2);
+
         if (big)
         {
             memcpy(big, prefix.data, prefix.len);
-            vsnprintf(big + prefix.len, (size_t) msg_len + 1, fmt, args);
+
+            va_list aq_heap;
+            va_copy(aq_heap, args);
+            vsnprintf(big + prefix.len, (size_t) msg_len + 1, fmt, aq_heap);
+            va_end(aq_heap);
 
             if (type != VX_LEVEL_PRINTF)
             {
@@ -257,7 +264,7 @@ vx_status vx_fwrite(const char *path, const char *fmt, ...)
         return VX_LIB_NOT_INITIALIZED;
     }
 
-    if (path == NULL || fmt == NULL)
+    if (path == nullptr || fmt == nullptr)
     {
         return VX_ERROR;
     }
@@ -299,6 +306,7 @@ vx_status vx_fappend(const char *path, const char *fmt, ...)
     }
 
     FILE *fp = fopen(path, "a");
+
     if (!fp)
     {
         vx_errlog("Failed to open: %s", path);
