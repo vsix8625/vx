@@ -158,4 +158,74 @@ bool vx_fs_rmrf(const char *path)
     return vx_win32_rm_internal(w_path);
 }
 
+//---------------------------------------------------------------------------------------------------- 
+
+vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
+{
+    vx_sv result          = {0};
+    bool  use_default_alloc = alloc == nullptr;
+
+    if (path == nullptr)
+    {
+        return result;
+    }
+
+    HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ,
+                           nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+    if (h == INVALID_HANDLE_VALUE)
+    {
+        VX_ASSERT_LOG("Failed to open %s", path);
+        return result;
+    }
+
+    LARGE_INTEGER size;
+
+    if (!GetFileSizeEx(h, &size))
+    {
+        VX_ASSERT_LOG("GetFileSizeEx failed for %s", path);
+        CloseHandle(h);
+        return result;
+    }
+
+    if (size.QuadPart == 0)
+    {
+        CloseHandle(h);
+        return result;
+    }
+
+    size_t len = (size_t) size.QuadPart;
+    char  *buf = use_default_alloc ? vx_malloc(len + 1) : alloc(user, len + 1);
+
+    if (buf == nullptr)
+    {
+        VX_ASSERT_LOG("Failed to allocate for %s", path);
+        CloseHandle(h);
+        return result;
+    }
+
+    DWORD read_bytes = 0;
+
+    if (!ReadFile(h, buf, (DWORD) len, &read_bytes, nullptr) || read_bytes != (DWORD) len)
+    {
+        VX_ASSERT_LOG("ReadFile failed for %s", path);
+        CloseHandle(h);
+
+        if (use_default_alloc)
+        {
+            vx_free(buf);
+        }
+
+        return result;
+    }
+
+    buf[len]    = '\0';
+	CloseHandle(h);
+
+    result.data = buf;
+    result.len  = (u32) len;
+
+    return result;
+}
+
 #endif

@@ -75,6 +75,8 @@ typedef struct vx_ticks
     u64 end;
 } vx_ticks;
 
+typedef void *(*vx_alloc_fn)(void *user, size_t size);
+
 static_assert(sizeof(void *) == 8);
 
 #endif  // DEFS_H_

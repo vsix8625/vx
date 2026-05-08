@@ -20,7 +20,8 @@ static u32  g_vx_fs_forbidden_count = 0;
 
 void vx_fs_forbid_path(const char *path)
 {
-    if (path == nullptr || g_vx_fs_forbidden_count >= VX_FS_FORBIDDEN_PATH_MAX_COUNT)
+    if (path == nullptr || path[0] == '\0' ||
+        g_vx_fs_forbidden_count >= VX_FS_FORBIDDEN_PATH_MAX_COUNT)
     {
         return;
     }
@@ -30,6 +31,15 @@ void vx_fs_forbid_path(const char *path)
     if (vx_fs_realpath(path, resolved) == nullptr)
     {
         return;
+    }
+
+    for (u32 i = 0; i < g_vx_fs_forbidden_count; i++)
+    {
+        if (vx_pathncmp(resolved, g_vx_fs_forbidden_paths[i], VX_PATH_MAX) == 0)
+        {
+            vx_errlog("Path already in forbidden list: %s", resolved);
+            return;
+        }
     }
 
     strncpy(g_vx_fs_forbidden_paths[g_vx_fs_forbidden_count], resolved, VX_PATH_MAX - 1);
@@ -46,16 +56,18 @@ bool vx_fs_is_path_protected(const char *target)
         return true;
     }
 
+    size_t t_len = strlen(target);
+
     for (u32 i = 0; i < g_vx_fs_forbidden_count; i++)
     {
         const char *restricted = g_vx_fs_forbidden_paths[i];
 
         size_t r_len = strlen(restricted);
-        size_t t_len = strlen(target);
 
-        if (vx_pathncmp(restricted, target, r_len) == 0)
+        /* Block if target == restricted (exact) or target is a parent of restricted */
+        if (vx_pathncmp(restricted, target, t_len) == 0)
         {
-            if (t_len == r_len || target[r_len] == VX_PATH_SEP)
+            if (t_len == r_len || restricted[t_len] == VX_PATH_SEP)
             {
                 return true;
             }
@@ -63,18 +75,20 @@ bool vx_fs_is_path_protected(const char *target)
     }
 
 #if defined(VX_OS_WINDOWS)
-    const char *defaults[] = {"C:\\", "C:\\Windows", "C:\\Users", nullptr};
+    const char *defaults[] = {"C:\\Windows", "C:\\Users", nullptr};
 #else
     const char *defaults[] = {"/", "/etc", "/usr", "/bin", "/boot", nullptr};
 #endif
 
     for (u32 i = 0; defaults[i]; ++i)
     {
-        size_t r_len = strlen(defaults[i]);
+        const char *restricted = defaults[i];
 
-        if (vx_pathncmp(defaults[i], target, r_len) == 0)
+        size_t r_len = strlen(restricted);
+
+        if (vx_pathncmp(target, restricted, t_len) == 0)
         {
-            if (strlen(target) == r_len || target[r_len] == VX_PATH_SEP)
+            if (t_len == r_len || restricted[t_len] == VX_PATH_SEP)
             {
                 return true;
             }
@@ -82,6 +96,16 @@ bool vx_fs_is_path_protected(const char *target)
     }
 
     return false;
+}
+
+void vx_fs_log_forbidden_paths(void)
+{
+    vx_log("Forbidden paths (%u):", g_vx_fs_forbidden_count);
+
+    for (u32 i = 0; i < g_vx_fs_forbidden_count; i++)
+    {
+        vx_log("  [%u] %s", i, g_vx_fs_forbidden_paths[i]);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
