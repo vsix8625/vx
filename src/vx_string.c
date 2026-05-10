@@ -109,3 +109,37 @@ void vx_fs_log_forbidden_paths(void)
 }
 
 //----------------------------------------------------------------------------------------------------
+
+bool vx_path_parent(char *path)
+{
+    if (path == nullptr || path[0] == '\0')
+    {
+        return false;
+    }
+
+    size_t len = strlen(path);
+
+    while (len > 0 && path[len - 1] == VX_PATH_SEP)
+    {
+        path[--len] = '\0';
+    }
+
+    for (i32 i = (i32) len - 1; i >= 0; i--)
+    {
+        if (path[i] == VX_PATH_SEP)
+        {
+            if (i == 0)
+            {
+                path[1] = '\0';
+            }
+            else
+            {
+                path[i] = '\0';
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}

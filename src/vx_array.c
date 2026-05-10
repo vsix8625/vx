@@ -1,5 +1,4 @@
 #include "vx_array.h"
-#include "vx_limits.h"
 #include "vx_io.h"
 
 #include <stdlib.h>
@@ -37,7 +36,6 @@ vx_array *vx_array_create(size_t initial_capacity)
         return nullptr;
     }
 
-    // arr->count    = 0; // from calloc
     arr->capacity = initial_capacity;
 
     return arr;
@@ -50,7 +48,13 @@ void vx_array_destroy(vx_array *arr)
         return;
     }
 
-    vx_free(arr->elements);
+    for (size_t i = 0; i < arr->count; i++)
+    {
+        if (arr->elements)
+        {
+            vx_free(arr->elements[i]);
+        }
+    }
     vx_free(arr);
 }
 

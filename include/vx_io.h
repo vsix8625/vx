@@ -2,7 +2,6 @@
 #ifndef IO_H_
     #define IO_H_
 
-    #include "vx_limits.h"
     #include "vx_defs.h"
     #include "vx_platform.h"
 

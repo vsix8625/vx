@@ -158,11 +158,11 @@ bool vx_fs_rmrf(const char *path)
     return vx_win32_rm_internal(w_path);
 }
 
-//---------------------------------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------------------------------
 
 vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 {
-    vx_sv result          = {0};
+    vx_sv result            = {0};
     bool  use_default_alloc = alloc == nullptr;
 
     if (path == nullptr)
@@ -170,8 +170,13 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
         return result;
     }
 
-    HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ,
-                           nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    HANDLE h = CreateFileA(path,
+                           GENERIC_READ,
+                           FILE_SHARE_READ,
+                           nullptr,
+                           OPEN_EXISTING,
+                           FILE_ATTRIBUTE_NORMAL,
+                           nullptr);
 
     if (h == INVALID_HANDLE_VALUE)
     {
@@ -219,13 +224,74 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
         return result;
     }
 
-    buf[len]    = '\0';
-	CloseHandle(h);
+    buf[len] = '\0';
+    CloseHandle(h);
 
     result.data = buf;
     result.len  = (u32) len;
 
     return result;
 }
+
+//----------------------------------------------------------------------------------------------------
+
+typedef struct
+{
+    HANDLE          h;
+    WIN32_FIND_DATA data;
+    bool            first;
+} vx_win32_dir;
+
+vx_dir_handle vx_fs_dir_open(const char *path)
+{
+    char buf[MAX_PATH];
+    snprintf(buf, MAX_PATH, "%s\\*", path);
+
+    vx_win32_dir *w = vx_malloc(sizeof(vx_win32_dir));
+    w->h            = FindFirstFileA(buf, &w->data);
+
+    if (w->h == INVALID_HANDLE_VALUE)
+    {
+        vx_free(w);
+        return NULL;
+    }
+
+    w->first = true;
+    return (vx_dir_handle) w;
+}
+
+bool vx_fs_dir_read(vx_dir_handle handle, vx_dir_entry *out_entry)
+{
+    vx_win32_dir *w = (vx_win32_dir *) handle;
+
+    if (!w->first)
+    {
+        if (!FindNextFileA(w->h, &w->data))
+        {
+            return false;
+        }
+    }
+    w->first = false;
+
+    out_entry->name     = w->data.cFileName;
+    out_entry->name_len = strlen(out_entry->name);
+    out_entry->is_dir   = (w->data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+
+    return true;
+}
+
+void vx_fs_dir_close(vx_dir_handle handle)
+{
+    if (!handle)
+    {
+        return;
+    }
+
+    vx_win32_dir *w = (vx_win32_dir *) handle;
+    FindClose(w->h);
+    vx_free(w);
+}
+
+//----------------------------------------------------------------------------------------------------
 
 #endif

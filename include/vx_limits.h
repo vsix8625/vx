@@ -1,8 +1,9 @@
 #ifndef LIMITS_H_
 #define LIMITS_H_
 
-#define VX_SIZE_MAX ((size_t) -1)
-#define VX_PATH_MAX (8192)
+#define VX_SIZE_MAX     ((size_t) -1)
+#define VX_PATH_MAX     (8192)
+#define VX_CMD_LINE_MAX (1 << 15)
 
 #define VX_BUF_SIZE_16   (1 << 4)
 #define VX_BUF_SIZE_32   (1 << 5)

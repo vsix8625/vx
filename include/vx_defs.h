@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "vx_limits.h"
+
 typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -29,10 +31,21 @@ typedef struct vx_string_view
 
 #define VX_SV(s) {s, sizeof(s) - 1}
 
-#define vx_malloc  malloc
-#define vx_calloc  calloc
-#define vx_realloc realloc
-#define vx_free    free
+#ifndef vx_malloc
+    #define vx_malloc malloc
+#endif
+
+#ifndef vx_calloc
+    #define vx_calloc calloc
+#endif
+
+#ifndef vx_realloc
+    #define vx_realloc realloc
+#endif
+
+#ifndef vx_free
+    #define vx_free free
+#endif
 
 typedef enum vx_exit : i32
 {
@@ -78,5 +91,14 @@ typedef struct vx_ticks
 typedef void *(*vx_alloc_fn)(void *user, size_t size);
 
 static_assert(sizeof(void *) == 8);
+
+typedef struct
+{
+    const char *name;
+    size_t      name_len;
+    bool        is_dir;
+} vx_dir_entry;
+
+typedef void *vx_dir_handle;
 
 #endif  // DEFS_H_

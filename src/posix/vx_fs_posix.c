@@ -5,6 +5,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include <dirent.h>
     #include <fcntl.h>
     #include <ftw.h>
 
@@ -145,5 +146,37 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 }
 
 //----------------------------------------------------------------------------------------------------
+
+vx_dir_handle vx_fs_dir_open(const char *path)
+{
+    return (vx_dir_handle) opendir(path);
+}
+
+bool vx_fs_dir_read(vx_dir_handle handle, vx_dir_entry *out_entry)
+{
+    DIR *d = (DIR *) handle;
+
+    struct dirent *entry = readdir(d);
+
+    if (entry == nullptr)
+    {
+        return false;
+    }
+
+    out_entry->name     = entry->d_name;
+    out_entry->name_len = strlen(entry->d_name);
+
+    out_entry->is_dir = (entry->d_type == DT_DIR);
+
+    return true;
+}
+
+void vx_fs_dir_close(vx_dir_handle handle)
+{
+    if (handle)
+    {
+        closedir((DIR *) handle);
+    }
+}
 
 #endif
