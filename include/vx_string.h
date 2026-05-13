@@ -35,4 +35,6 @@ VX_API void vx_fs_log_forbidden_paths(void);
 
 VX_API bool vx_path_parent(char *path);
 
+VX_API vx_sv vx_sv_from_cstr(const char *cstr);
+
 #endif  // VX_STRING_H_

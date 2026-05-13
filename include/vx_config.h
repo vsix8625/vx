@@ -3,6 +3,6 @@
  
 #define VX_VERSION_MAJOR 0
 #define VX_VERSION_MINOR 1
-#define VX_VERSION_PATCH 9
-#define VX_VERSION_STRING "0.1.9"
+#define VX_VERSION_PATCH 10
+#define VX_VERSION_STRING "0.1.10"
 #define VX_BUILD_TYPE "release"

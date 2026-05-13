@@ -143,3 +143,11 @@ bool vx_path_parent(char *path)
 
     return false;
 }
+
+vx_sv vx_sv_from_cstr(const char *cstr)
+{
+    vx_sv sv;
+    sv.data = cstr;
+    sv.len  = strlen(cstr);
+    return sv;
+}

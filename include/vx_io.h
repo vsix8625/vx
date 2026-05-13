@@ -39,7 +39,7 @@ VX_API vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
  *
  * `char buf[VX_PATH_MAX];`
  *
- * struct `vf_sbuf` sbuf = {
+ *  `vx_sbuf` sbuf = {
  *                         .data   = buf,
  *                         .size   = sizeof(buf),
  *                         .offset = 0
