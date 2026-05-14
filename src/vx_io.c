@@ -322,12 +322,7 @@ vx_status vx_fappend(const char *path, const char *fmt, ...)
 
 void vx_sbuf_append(vx_sbuf *buf, const char *fmt, ...)
 {
-    if (!vx_initialized())
-    {
-        return;
-    }
-
-    if (buf == nullptr || buf->offset >= buf->size)
+    if (!vx_initialized() || buf == nullptr || buf->offset >= buf->size)
     {
         return;
     }
@@ -335,19 +330,16 @@ void vx_sbuf_append(vx_sbuf *buf, const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
 
-    i32 remaining = (i32) (buf->size - buf->offset);
-    i32 written   = vsnprintf(buf->data + buf->offset, remaining, fmt, args);
+    size_t remaining = buf->size - buf->offset;
+
+    i32 written = vsnprintf(buf->data + buf->offset, remaining, fmt, args);
 
     va_end(args);
 
     if (written > 0)
     {
-        if (buf->offset >= buf->size)
-        {
-            size_t actual_added =
-                (written < remaining) ? (size_t) written : (size_t) (remaining - 1);
+        size_t actual_added = ((size_t) written < remaining) ? (size_t) written : (remaining - 1);
 
-            buf->offset += actual_added;
-        }
+        buf->offset += actual_added;
     }
 }

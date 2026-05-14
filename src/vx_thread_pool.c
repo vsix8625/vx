@@ -33,6 +33,14 @@ static void *vx_pool_worker(void *arg)
             job.fn(job.arg);
 
             atomic_fetch_sub(&pool->active_jobs, 1);
+
+            if (atomic_load(&pool->active_jobs) == 0 &&
+                atomic_load(&pool->queue.head) == atomic_load(&pool->queue.tail))
+            {
+                vx_mutex_lock(&pool->wait_mutex);
+                vx_cond_signal(&pool->wait_cond);
+                vx_mutex_unlock(&pool->wait_mutex);
+            }
         }
     }
 
@@ -61,6 +69,9 @@ vx_status vx_thread_pool_create(struct vx_thread_pool *pool, u32 thread_count, u
         return VX_ERROR;
     }
 
+    vx_mutex_init(&pool->wait_mutex);
+    vx_cond_init(&pool->wait_cond);
+
     pool->threads = vx_calloc(thread_count, sizeof(struct vx_thread));
 
     if (pool->threads == nullptr)
@@ -74,11 +85,8 @@ vx_status vx_thread_pool_create(struct vx_thread_pool *pool, u32 thread_count, u
     {
         if (vx_thread_create(&pool->threads[i], vx_pool_worker, pool) != VX_OK)
         {
-            atomic_store(&pool->shutdown, true);
-            vx_sem_post(&pool->sem);
-            vx_sem_destroy(&pool->sem);
-            vx_job_queue_destroy(&pool->queue);
-            vx_free(pool->threads);
+            pool->thread_count = i;
+            vx_thread_pool_destroy(pool);
             return VX_ERROR;
         }
     }
@@ -108,27 +116,15 @@ vx_status vx_thread_pool_push(struct vx_thread_pool *pool, vx_thread_fn fn, void
 
 vx_status vx_thread_pool_wait(struct vx_thread_pool *pool)
 {
-    if (pool == nullptr)
-    {
-        return VX_ERROR;
-    }
-
-    u32 spins = 0;
+    vx_mutex_lock(&pool->wait_mutex);
 
     while (atomic_load(&pool->active_jobs) > 0 ||
            atomic_load(&pool->queue.head) != atomic_load(&pool->queue.tail))
     {
-        if (spins < 1000)
-        {
-            vx_pause();
-            spins++;
-        }
-        else
-        {
-            vx_yield();
-        }
-        vx_pause();
+        vx_cond_wait(&pool->wait_cond, &pool->wait_mutex);
     }
+
+    vx_mutex_unlock(&pool->wait_mutex);
     return VX_OK;
 }
 
@@ -150,6 +146,9 @@ void vx_thread_pool_destroy(struct vx_thread_pool *pool)
     {
         vx_thread_join(&pool->threads[i]);
     }
+
+    vx_cond_destroy(&pool->wait_cond);
+    vx_mutex_destroy(&pool->wait_mutex);
 
     vx_job_queue_destroy(&pool->queue);
     vx_sem_destroy(&pool->sem);

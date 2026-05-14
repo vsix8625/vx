@@ -62,4 +62,49 @@ u64 vx_thread_id(void)
     return (u64) pthread_self();
 }
 
+void vx_mutex_init(vx_mutex *m)
+{
+    pthread_mutex_init(m, NULL);
+}
+
+void vx_mutex_destroy(vx_mutex *m)
+{
+    pthread_mutex_destroy(m);
+}
+
+void vx_mutex_lock(vx_mutex *m)
+{
+    pthread_mutex_lock(m);
+}
+
+void vx_mutex_unlock(vx_mutex *m)
+{
+    pthread_mutex_unlock(m);
+}
+
+void vx_cond_init(vx_cond *c)
+{
+    pthread_cond_init(c, NULL);
+}
+
+void vx_cond_destroy(vx_cond *c)
+{
+    pthread_cond_destroy(c);
+}
+
+void vx_cond_signal(vx_cond *c)
+{
+    pthread_cond_signal(c);
+}
+
+void vx_cond_broadcast(vx_cond *c)
+{
+    pthread_cond_broadcast(c);
+}
+
+void vx_cond_wait(vx_cond *c, vx_mutex *m)
+{
+    pthread_cond_wait(c, m);
+}
+
 #endif

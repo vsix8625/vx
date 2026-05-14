@@ -58,6 +58,9 @@ struct vx_thread_pool
     vx_sem sem;
 
     atomic_bool shutdown;
+
+    vx_mutex wait_mutex;
+    vx_cond  wait_cond;
 };
 
 // clang-format off
@@ -76,6 +79,16 @@ VX_API i32  vx_sem_init(vx_sem *sem, u32 initial_count);
 VX_API void vx_sem_wait(vx_sem *sem);
 VX_API void vx_sem_post(vx_sem *sem);
 VX_API void vx_sem_destroy(vx_sem *sem);
+
+VX_API void vx_mutex_init(vx_mutex *m);
+VX_API void vx_mutex_lock(vx_mutex *m);
+VX_API void vx_mutex_unlock(vx_mutex *m);
+VX_API void vx_mutex_destroy(vx_mutex *m);
+
+VX_API void vx_cond_init(vx_cond *c);
+VX_API void vx_cond_wait(vx_cond *c, vx_mutex *m);
+VX_API void vx_cond_signal(vx_cond *c);
+VX_API void vx_cond_destroy(vx_cond *c);
 
 #endif  // VX_USE_THREADS
 #endif  // VX_THREAD_H_

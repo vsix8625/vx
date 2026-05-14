@@ -67,4 +67,42 @@ u64 vx_thread_id(void)
     return (u64) GetCurrentThreadId();
 }
 
+void vx_mutex_init(vx_mutex *m)
+{
+    InitializeCriticalSection(m);
+}
+void vx_mutex_destroy(vx_mutex *m)
+{
+    DeleteCriticalSection(m);
+}
+void vx_mutex_lock(vx_mutex *m)
+{
+    EnterCriticalSection(m);
+}
+void vx_mutex_unlock(vx_mutex *m)
+{
+    LeaveCriticalSection(m);
+}
+
+void vx_cond_init(vx_cond *c)
+{
+    InitializeConditionVariable(c);
+}
+void vx_cond_destroy(vx_cond *c)
+{ /* Windows CVs don't need explicit destruction */
+}
+void vx_cond_signal(vx_cond *c)
+{
+    WakeConditionVariable(c);
+}
+void vx_cond_broadcast(vx_cond *c)
+{
+    WakeAllConditionVariable(c);
+}
+
+void vx_cond_wait(vx_cond *c, vx_mutex *m)
+{
+    SleepConditionVariableCS(c, m, INFINITE);
+}
+
 #endif

@@ -23,6 +23,9 @@
     #define VX_PATH_SEP     '\\'
     #define VX_PATH_SEP_STR "\\"
 
+typedef CRITICAL_SECTION   vx_mutex;
+typedef CONDITION_VARIABLE vx_cond;
+
     #ifndef S_ISDIR
         #define S_ISDIR(mode) (((mode) & _S_IFMT) == _S_IFDIR)
     #endif
@@ -50,6 +53,9 @@
 
     #define VX_FILENO fileno
     #define VX_DEVNUL "/dev/null"
+
+typedef pthread_mutex_t vx_mutex;
+typedef pthread_cond_t  vx_cond;
 
 #endif
 
