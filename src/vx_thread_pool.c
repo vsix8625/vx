@@ -1,4 +1,5 @@
 #include "vx_thread.h"
+#include "vx_util.h"
 
 #if defined(VX_USE_THREADS)
     #include <stdlib.h>
@@ -112,10 +113,21 @@ vx_status vx_thread_pool_wait(struct vx_thread_pool *pool)
         return VX_ERROR;
     }
 
+    u32 spins = 0;
+
     while (atomic_load(&pool->active_jobs) > 0 ||
            atomic_load(&pool->queue.head) != atomic_load(&pool->queue.tail))
     {
-        // spin
+        if (spins < 1000)
+        {
+            vx_pause();
+            spins++;
+        }
+        else
+        {
+            vx_yield();
+        }
+        vx_pause();
     }
     return VX_OK;
 }
@@ -176,7 +188,6 @@ static vx_status vx_job_queue_push(struct vx_job_queue *q, vx_thread_fn fn, void
     }
 
     u32 tail = atomic_load(&q->tail);
-
     u32 next = (tail + 1) % q->size;
 
     if (next == atomic_load(&q->head))
@@ -187,28 +198,31 @@ static vx_status vx_job_queue_push(struct vx_job_queue *q, vx_thread_fn fn, void
     q->jobs[tail].fn  = fn;
     q->jobs[tail].arg = arg;
 
-    atomic_store(&q->tail, next);
+    atomic_store_explicit(&q->tail, next, memory_order_release);
 
     return VX_OK;
 }
 
 static vx_status vx_job_queue_pop(struct vx_job_queue *q, struct vx_job *job)
 {
-    if (q == nullptr || job == nullptr)
+    u32 head = atomic_load_explicit(&q->head, memory_order_acquire);
+
+    while (1)
     {
-        return VX_ERROR;
+        if (head == atomic_load_explicit(&q->tail, memory_order_acquire))
+        {
+            return VX_ERROR;
+        }
+
+        u32 next = (head + 1) % q->size;
+
+        if (atomic_compare_exchange_weak_explicit(
+                &q->head, &head, next, memory_order_acq_rel, memory_order_acquire))
+        {
+            *job = q->jobs[head];
+            return VX_OK;
+        }
     }
-
-    u32 head = atomic_load(&q->head);
-
-    if (head == atomic_load(&q->tail))
-    {
-        return VX_ERROR;  // empty
-    }
-
-    *job = q->jobs[head];
-    atomic_store(&q->head, (head + 1) % q->size);
-    return VX_OK;
 }
 
 static void vx_job_queue_destroy(struct vx_job_queue *q)

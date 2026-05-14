@@ -37,4 +37,10 @@ VX_API bool vx_path_parent(char *path);
 
 VX_API vx_sv vx_sv_from_cstr(const char *cstr);
 
+/**
+ * Compares a vx_sv against a null-terminated C-string.
+ * Returns 0 if they are identical in content and length.
+ */
+VX_API i32 vx_sv_strcmp(vx_sv sv, const char *cstr);
+
 #endif  // VX_STRING_H_

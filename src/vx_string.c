@@ -151,3 +151,25 @@ vx_sv vx_sv_from_cstr(const char *cstr)
     sv.len  = strlen(cstr);
     return sv;
 }
+
+/**
+ * Compares a vx_sv against a null-terminated C-string.
+ * Returns 0 if they are identical in content and length.
+ */
+i32 vx_sv_strcmp(vx_sv sv, const char *cstr)
+{
+    if (cstr == nullptr)
+    {
+        return 1;
+    }
+
+    size_t cstr_len = strlen(cstr);
+
+    // lens dont match cant be equal
+    if (sv.len != cstr_len)
+    {
+        return (sv.len < cstr_len) ? -1 : 1;
+    }
+
+    return memcmp(sv.data, cstr, sv.len);
+}

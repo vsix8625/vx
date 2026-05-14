@@ -7,6 +7,7 @@
     #include <string.h>
     #include <dirent.h>
     #include <fcntl.h>
+    #include <sys/sendfile.h>
     #include <ftw.h>
 
     #include "vx_string.h"
@@ -20,6 +21,46 @@ bool vx_fs_mv(const char *src, const char *dest)
     }
 
     return rename(src, dest) == 0;
+}
+
+bool vx_fs_cp(const char *src, const char *dest)
+{
+    if (src == nullptr || dest == nullptr)
+    {
+        return false;
+    }
+
+    i32 src_fd = open(src, O_RDONLY);
+
+    if (src_fd < 0)
+    {
+        close(src_fd);
+        return false;
+    }
+
+    vx_stat_struct st;
+
+    if (fstat(src_fd, &st) < 0)
+    {
+        close(src_fd);
+        return false;
+    }
+
+    i32 dest_fd = open(dest, O_WRONLY | O_CREAT | O_TRUNC, st.st_mode);
+
+    if (dest_fd < 0)
+    {
+        close(src_fd);
+        return false;
+    }
+
+    off_t   offset = 0;
+    ssize_t sent   = sendfile(dest_fd, src_fd, &offset, st.st_size);
+
+    close(src_fd);
+    close(dest_fd);
+
+    return sent == st.st_size;
 }
 
 char *vx_fs_realpath(const char *path, char *resolved)

@@ -14,4 +14,17 @@ VX_API char *vx_trim_s(char *s);
 
 VX_API void vx_yield(void);
 
+static inline void vx_pause(void)
+{
+#if defined(VX_OS_WINDOWS)
+    YieldProcessor();
+#elif defined(VX_OS_LINUX) || defined(VX_OS_DARWIN)
+    #if defined(__x86_64__) || defined(__i386__)
+    __builtin_ia32_pause();
+    #else
+    __asm__ __volatile__("" ::: "memory");
+    #endif
+#endif
+}
+
 #endif  // VX_UTIL_H_
