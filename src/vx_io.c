@@ -2,6 +2,7 @@
 #include "vx.h"
 #include "vx_util.h"
 
+#include <linux/limits.h>
 #include <stdarg.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -59,6 +60,8 @@ static inline bool vx_is_tty(i32 fd)
     return vx_isatty(fd);
 }
 
+// NOTE: deadlocked on MT
+// NOTE: Testing lockfree logger for small buffs and using a 4096 buffer
 static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 {
     if (!vx_initialized() || fmt == nullptr)
@@ -147,24 +150,13 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 
     // end of setup
 
-    while (atomic_flag_test_and_set(&g_io_atomic_lock))
-    {
-        vx_yield();
-    }
-
-    char buf[VX_PATH_MAX];
+    char buf[PATH_MAX];
     memcpy(buf, prefix.data, prefix.len);
 
     va_list aq;
     va_copy(aq, args);
     i32 msg_len = vsnprintf(buf + prefix.len, sizeof(buf) - prefix.len - 1, fmt, aq);
     va_end(aq);
-
-    if (msg_len < 0)
-    {
-        atomic_flag_clear(&g_io_atomic_lock);
-        return;
-    }
 
     size_t total_len = prefix.len + (size_t) msg_len;
 
@@ -178,6 +170,11 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
     }
     else
     {
+        while (atomic_flag_test_and_set(&g_io_atomic_lock))
+        {
+            vx_yield();
+        }
+
         char *big = vx_malloc(total_len + 2);
 
         if (big)
@@ -198,9 +195,8 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
             vx_write(fd, big, total_len);
             vx_free(big);
         }
+        atomic_flag_clear(&g_io_atomic_lock);
     }
-
-    atomic_flag_clear(&g_io_atomic_lock);
 }
 
 void vx_printf(const char *fmt, ...)
