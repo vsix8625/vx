@@ -41,9 +41,24 @@ vx_process_spawn(struct vx_process *proc, const char *cmd, char **args, struct v
 
     if (cfg)
     {
+        // TODO: can it handle cfg->working_dir?
+
         if (cfg->flags & VX_PROCESS_FLGAGS_BG)
         {
             flags |= DETACHED_PROCESS;
+        }
+
+        if (cfg->stdout_path)
+        {
+            HANDLE hFile   = CreateFileA(cfg->stdout_path,
+                                         GENERIC_WRITE,
+                                         FILE_SHARE_READ,
+                                         nullptr,
+                                         CREATE_ALWAYS,
+                                         FILE_ATTRIBUTE_NORMAL,
+                                         nullptr);
+            si.hStdOutput  = hFile;
+            si.dwFlags    |= STARTF_USESTDHANDLES;
         }
     }
 

@@ -29,9 +29,18 @@ vx_process_spawn(struct vx_process *proc, const char *cmd, char **args, struct v
             posix_spawn_file_actions_addchdir_np(&actions, cfg->working_dir);
         }
 
+        if (cfg->stdout_path)
+        {
+            posix_spawn_file_actions_addopen(
+                &actions, STDOUT_FILENO, cfg->stdout_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        }
+
         if (cfg->flags & VX_PROCESS_FLAGS_SILENT)
         {
-            posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0);
+            if (cfg->stdout_path == nullptr)
+            {
+                posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0);
+            }
             posix_spawn_file_actions_addopen(&actions, STDERR_FILENO, "/dev/null", O_WRONLY, 0);
         }
 
@@ -66,10 +75,9 @@ i32 vx_process_wait(struct vx_process *proc)
 
     i32 status;
     waitpid(proc->pid, &status, 0);
-
-    proc->running   = false;
     proc->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
 
+    proc->running = false;
     return proc->exit_code;
 }
 
