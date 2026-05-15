@@ -11,6 +11,9 @@
  */
 VX_API bool vx_fs_mv(const char *src, const char *dest);
 
+VX_API bool vx_fs_cp(const char *src, const char *dest);
+VX_API bool vx_fs_ln(const char *src, const char *dest);
+
 /*
  * Uses `realpath` from `<stdlib.h>` in `Linux` and `_wfullpath` in `Windows`.
  *

@@ -98,7 +98,7 @@ char *vx_trim_s(char *s)
 
 void vx_yield(void)
 {
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(VX_OS_WINDOWS)
     Sleep(0);
 #else
     struct timespec ts = {.tv_sec = 0, .tv_nsec = 100 * 100};

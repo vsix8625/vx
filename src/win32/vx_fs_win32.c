@@ -27,6 +27,28 @@ bool vx_fs_cp(const char *src, const char *dest)
     return CopyFileW(w_src, w_dest, FALSE) != 0;
 }
 
+bool vx_fs_ln(const char *src, const char *dest)
+{
+    wchar_t w_src[VX_PATH_MAX], w_dest[VX_PATH_MAX];
+
+    MultiByteToWideChar(CP_UTF8, 0, src, -1, w_src, VX_PATH_MAX);
+    MultiByteToWideChar(CP_UTF8, 0, dest, -1, w_dest, VX_PATH_MAX);
+
+    if (CreateHardLinkW(w_dest, w_src, NULL) != 0)
+    {
+        return true;
+    }
+
+    DWORD error = GetLastError();
+    if (error == ERROR_ALREADY_EXISTS || error == ERROR_FILE_EXISTS)
+    {
+        DeleteFileW(w_dest);
+        return CreateHardLinkW(w_dest, w_src, NULL) != 0;
+    }
+
+    return false;
+}
+
 char *vx_fs_realpath(const char *path, char *resolved)
 {
     if (path == nullptr)

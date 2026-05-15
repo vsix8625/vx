@@ -88,4 +88,6 @@ typedef pthread_cond_t  vx_cond;
 
 VX_API void vx_io_init(void);
 
+VX_API const char *vx_platform_get_cache_dir(void);
+
 #endif  // VX_PLATFORM_H_

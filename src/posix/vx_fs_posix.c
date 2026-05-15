@@ -34,7 +34,6 @@ bool vx_fs_cp(const char *src, const char *dest)
 
     if (src_fd < 0)
     {
-        close(src_fd);
         return false;
     }
 
@@ -61,6 +60,17 @@ bool vx_fs_cp(const char *src, const char *dest)
     close(dest_fd);
 
     return sent == st.st_size;
+}
+
+bool vx_fs_ln(const char *src, const char *dest)
+{
+    if (src == nullptr || dest == nullptr)
+    {
+        return false;
+    }
+
+    unlink(dest);
+    return link(src, dest) == 0;
 }
 
 char *vx_fs_realpath(const char *path, char *resolved)
