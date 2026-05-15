@@ -230,4 +230,49 @@ void vx_fs_dir_close(vx_dir_handle handle)
     }
 }
 
+vx_status vx_fs_which(const char *name, char *out_path, size_t out_size)
+{
+    if (name == nullptr || out_path == nullptr || out_size == 0)
+    {
+        return VX_ERROR;
+    }
+
+    if (strchr(name, '/') != nullptr)
+    {
+        if (access(name, X_OK) == 0)
+        {
+            snprintf(out_path, out_size, "%s", name);
+            return VX_OK;
+        }
+        return VX_ERROR;
+    }
+
+    const char *env_path = getenv("PATH");
+    if (env_path == nullptr)
+    {
+        return VX_ERROR;
+    }
+
+    char *path_copy = vx_strdup(env_path);  // Use your VX version of strdup
+    char *dir       = strtok(path_copy, ":");
+
+    while (dir != nullptr)
+    {
+        char temp[VX_PATH_MAX];
+        snprintf(temp, sizeof(temp), "%s/%s", dir, name);
+
+        if (access(temp, X_OK) == 0)
+        {
+            snprintf(out_path, out_size, "%s", temp);
+            vx_free(path_copy);
+            return VX_OK;
+        }
+
+        dir = strtok(nullptr, ":");
+    }
+
+    vx_free(path_copy);
+    return VX_ERROR;
+}
+
 #endif

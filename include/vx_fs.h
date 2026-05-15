@@ -41,6 +41,9 @@ VX_API vx_dir_handle vx_fs_dir_open(const char *path);
 VX_API bool          vx_fs_dir_read(vx_dir_handle handle, vx_dir_entry *out_entry);
 VX_API void          vx_fs_dir_close(vx_dir_handle handle);
 
+// TODO: win32 version
+VX_API vx_status vx_fs_which(const char *name, char *out_path, size_t out_size);
+
 //----------------------------------------------------------------------------------------------------
 
 #endif  // VX_FS_H_

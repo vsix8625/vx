@@ -43,6 +43,10 @@ typedef struct vx_string_view
     #define vx_realloc realloc
 #endif
 
+#ifndef vx_strdup
+    #define vx_strdup strdup
+#endif
+
 #ifndef vx_free
     #define vx_free free
 #endif
