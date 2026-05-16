@@ -3,7 +3,7 @@
 
 // NOTE: windows code untested
 
-#if defined(VX_OS_WINDOWS)
+#if defined(VX_OS_WINDOWS) && defined(VX_USE_PROCESS)
 
 vx_status
 vx_process_spawn(struct vx_process *proc, const char *cmd, char **args, struct vx_proc_cfg *cfg)

@@ -4,7 +4,7 @@
 #include "vx_platform.h"
 #include "vx_defs.h"
 
-VX_API void vx_init_time(void);
+VX_INTERNAL void vx_init_time(void);
 
 /*
  * Get the number of nanoseconds since vx library initialization

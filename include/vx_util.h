@@ -1,7 +1,7 @@
 #ifndef VX_UTIL_H_
 #define VX_UTIL_H_
 
-#include "vx_io.h"
+#include "vx_platform.h"
 
 #define VX_ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #define VX_CAST(type, v)   ((type) v)

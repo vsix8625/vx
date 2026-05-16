@@ -1,6 +1,8 @@
 #ifndef LIMITS_H_
 #define LIMITS_H_
 
+#include "vx_platform.h"
+
 #define VX_SIZE_MAX     ((size_t) -1)
 #define VX_PATH_MAX     (8192)
 #define VX_CMD_LINE_MAX (1 << 15)

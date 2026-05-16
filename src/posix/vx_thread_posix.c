@@ -1,6 +1,7 @@
 #include "vx_thread.h"
 
-#if defined(VX_OS_LINUX)
+#if defined(VX_OS_LINUX) && defined(VX_USE_THREADS)
+
     #include <pthread.h>
 
 static void *vx_thread_entry(void *arg)

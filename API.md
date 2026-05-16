@@ -26,7 +26,7 @@
 |------|-------------|
 | `vx_fs_mv` | Move/Rename `src` to `dest`. Returns `true` on success, or `false` on failure. |
 | `vx_fs_cp` | — |
-| `vx_fs_ln` | — |
+| `vx_fs_ln` | Creates a hard link from src to dest. If replace is true, removes dest before linking (safe overwrite). If replace is false, fails if dest already exists. Uses link() syscall — both paths must be on the same filesystem. @param src     the existing file to link from. @param dest    the new directory entry to create. @param replace if true, unlinks dest before creating the link. @return true on success, false otherwise. |
 | `vx_fs_realpath` | Uses `realpath` from `<stdlib.h>` in `Linux` and `_wfullpath` in `Windows`. NOTE: If resolved is `nullptr` it will return a heap allocated buffer, caller is responsible to free(). |
 | `vx_fs_rmrf` | — |
 | `vx_fs_read` | If alloc is nullptr, uses `vx_malloc`. Caller must vx_free result.data when done. If alloc is provided, memory lifetime is managed by the allocator. |
@@ -35,6 +35,14 @@
 | `vx_fs_dir_read` | — |
 | `vx_fs_dir_close` | — |
 | `vx_fs_which` | — |
+| `vx_fs_forbid_path` | — |
+| `vx_fs_is_path_protected` | Checks whether the target path is protected from deletion. A path is protected if it is equal to, or a parent of, any forbidden path. This ensures that deleting a protected path or any of its ancestors is blocked, while children of a protected path remain deletable. @param target the resolved absolute path to check. @return: `true` if the path is protected, `false` otherwise. |
+| `vx_fs_log_forbidden_paths` | — |
+| `vx_clear_term` | — |
+| `vx_isdir` | — |
+| `vx_isfile` | — |
+| `vx_getcwd_fn` | Thread local buf |
+| `vx_fs_is_abspath` | — |
 
 ## `vx_io.h`
 
@@ -49,16 +57,11 @@
 | `vx_fwrite` | Write formatted output to a file at `path`. Thread-safe via spinlock. @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written. |
 | `vx_fappend` | Append formatted output to a file at `path`. Thread-safe via spinlock. @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written. |
 | `vx_sbuf_append` | `char buf[VX_PATH_MAX];` `vx_sbuf` sbuf = { .data   = buf, .size   = sizeof(buf), .offset = 0 }; |
-| `vx_clear_term` | — |
-| `vx_isdir` | — |
-| `vx_isfile` | — |
-| `vx_getcwd_fn` | Thread local buf |
 
 ## `vx_platform.h`
 
 | Name | Description |
 |------|-------------|
-| `vx_io_init` | — |
 | `vx_platform_get_cache_dir` | — |
 
 ## `vx_process.h`
@@ -75,9 +78,6 @@
 |------|-------------|
 | `vx_strncmplit` | — |
 | `vx_pathncmp` | — |
-| `vx_fs_forbid_path` | — |
-| `vx_fs_is_path_protected` | Checks whether the target path is protected from deletion. A path is protected if it is equal to, or a parent of, any forbidden path. This ensures that deleting a protected path or any of its ancestors is blocked, while children of a protected path remain deletable. @param target the resolved absolute path to check. @return: `true` if the path is protected, `false` otherwise. |
-| `vx_fs_log_forbidden_paths` | — |
 | `vx_path_parent` | — |
 | `vx_sv_from_cstr` | — |
 | `vx_sv_strcmp` | Compares a vx_sv against a null-terminated C-string. Returns 0 if they are identical in content and length. |
@@ -111,7 +111,6 @@
 
 | Name | Description |
 |------|-------------|
-| `vx_init_time` | — |
 | `vx_time_ns` | Get the number of nanoseconds since vx library initialization |
 | `vx_time_micro` | Get the number of microseconds since vx library initialization |
 | `vx_time_ms` | Get the number of millieseconds since vx library initialization |
@@ -131,11 +130,11 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (50)
+## ⚠ Undocumented (48)
 
 These declarations have no doc comment yet:
 
-- `vx_clear_term` — *vx_io.h*
+- `vx_clear_term` — *vx_fs.h*
 - `vx_cond_destroy` — *vx_thread.h*
 - `vx_cond_init` — *vx_thread.h*
 - `vx_cond_signal` — *vx_thread.h*
@@ -146,16 +145,14 @@ These declarations have no doc comment yet:
 - `vx_fs_dir_close` — *vx_fs.h*
 - `vx_fs_dir_open` — *vx_fs.h*
 - `vx_fs_dir_read` — *vx_fs.h*
-- `vx_fs_forbid_path` — *vx_string.h*
+- `vx_fs_forbid_path` — *vx_fs.h*
+- `vx_fs_is_abspath` — *vx_fs.h*
 - `vx_fs_is_dot_dir` — *vx_fs.h*
-- `vx_fs_ln` — *vx_fs.h*
-- `vx_fs_log_forbidden_paths` — *vx_string.h*
+- `vx_fs_log_forbidden_paths` — *vx_fs.h*
 - `vx_fs_rmrf` — *vx_fs.h*
 - `vx_fs_which` — *vx_fs.h*
-- `vx_init_time` — *vx_time.h*
-- `vx_io_init` — *vx_platform.h*
-- `vx_isdir` — *vx_io.h*
-- `vx_isfile` — *vx_io.h*
+- `vx_isdir` — *vx_fs.h*
+- `vx_isfile` — *vx_fs.h*
 - `vx_log` — *vx_io.h*
 - `vx_mutex_destroy` — *vx_thread.h*
 - `vx_mutex_init` — *vx_thread.h*
@@ -185,3 +182,4 @@ These declarations have no doc comment yet:
 - `vx_trim_s` — *vx_util.h*
 - `vx_warn` — *vx_io.h*
 - `vx_yield` — *vx_util.h*
+

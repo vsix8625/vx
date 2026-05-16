@@ -4,6 +4,10 @@
 #include "vx_platform.h"
 #include "vx_defs.h"
 
+#if !defined(VX_NO_THREADS)
+    #define VX_USE_THREADS
+#endif
+
 #if defined(VX_USE_THREADS)
 
     #include <stdatomic.h>

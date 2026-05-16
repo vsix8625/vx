@@ -1,6 +1,7 @@
 #include "vx_platform.h"
 #include "vx_util.h"
 #include "vx_limits.h"
+#include "vx_io.h"
 
 #include <ctype.h>
 #include <errno.h>

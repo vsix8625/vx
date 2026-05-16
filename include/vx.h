@@ -2,12 +2,21 @@
 #define VX_H_
 
 #include "vx_io.h"
-#include "vx_string.h"
-#include "vx_array.h"
 #include "vx_config.h"
+#include "vx_string.h"
+#include "vx_limits.h"
+#include "vx_array.h"
 #include "vx_time.h"
 #include "vx_util.h"
 #include "vx_fs.h"
+
+#if defined(VX_USE_THREADS)
+    #include "vx_thread.h"
+#endif
+
+#if defined(VX_USE_PROCESS)
+    #include "vx_process.h"
+#endif
 
 /*
  * @return: `true` if initialized or `false`.

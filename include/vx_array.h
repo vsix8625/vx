@@ -1,8 +1,7 @@
 #ifndef VX_ARRAY_H_
 #define VX_ARRAY_H_
 
-#include "vx_defs.h"
-#include "vx_platform.h"
+#include "vx_limits.h"
 
 typedef struct vx_array
 {

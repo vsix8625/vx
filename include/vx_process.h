@@ -2,7 +2,12 @@
 #define VX_PROCESS_H_
 
 #include "vx_platform.h"
-#include "vx_defs.h"
+
+#if !defined(VX_NO_PROCESS)
+    #define VX_USE_PROCESS
+#endif
+
+#if defined(VX_USE_PROCESS)
 
 typedef enum sx_proc_flags : u8
 {
@@ -24,12 +29,12 @@ struct vx_proc_cfg
 
 struct vx_process
 {
-#if defined(VX_OS_WINDOWS)
+    #if defined(VX_OS_WINDOWS)
     HANDLE handle;
     HANDLE thread_handle;
-#else
+    #else
     pid_t pid;
-#endif
+    #endif
 
     i32  exit_code;
     bool running;
@@ -66,5 +71,7 @@ VX_API vx_status vx_process_spawn(struct vx_process  *proc,
 
 VX_API i32  vx_process_wait(struct vx_process *proc);
 VX_API void vx_process_kill(struct vx_process *proc);
+
+#endif
 
 #endif  // VX_PROCESS_H_

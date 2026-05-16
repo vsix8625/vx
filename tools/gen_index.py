@@ -17,7 +17,7 @@ from pathlib import Path
 DECL_MARKERS = ("VX_API", "static inline", "static __inline")
 
 # Max lines to look *back* for a doc comment block
-COMMENT_LOOKBACK = 20
+COMMENT_LOOKBACK = 30
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,7 @@
 #include "vx_fs.h"
 #include "vx_string.h"
 #include "vx_util.h"
+#include "vx_io.h"
 
 i32 vx_pathncmp(const char *s1, const char *s2, size_t n)
 {

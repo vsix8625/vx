@@ -2,7 +2,7 @@
 #pragma once
  
 #define VX_VERSION_MAJOR 0
-#define VX_VERSION_MINOR 1
-#define VX_VERSION_PATCH 11
-#define VX_VERSION_STRING "0.1.11"
+#define VX_VERSION_MINOR 2
+#define VX_VERSION_PATCH 2
+#define VX_VERSION_STRING "0.2.2"
 #define VX_BUILD_TYPE "release"

@@ -2,8 +2,11 @@
 #define VX_FS_H_
 
 #include "vx_platform.h"
-#include "vx_defs.h"
 #include "vx_string.h"
+#include "vx_io.h"
+
+#include <ctype.h>
+#include <stdio.h>
 
 /*
  * Move/Rename `src` to `dest`.
@@ -12,7 +15,19 @@
 VX_API bool vx_fs_mv(const char *src, const char *dest);
 
 VX_API bool vx_fs_cp(const char *src, const char *dest);
-VX_API bool vx_fs_ln(const char *src, const char *dest);
+
+/*
+ * Creates a hard link from src to dest.
+ * If replace is true, removes dest before linking (safe overwrite).
+ * If replace is false, fails if dest already exists.
+ * Uses link() syscall — both paths must be on the same filesystem.
+ *
+ * @param src     the existing file to link from.
+ * @param dest    the new directory entry to create.
+ * @param replace if true, unlinks dest before creating the link.
+ * @return true on success, false otherwise.
+ */
+VX_API bool vx_fs_ln(const char *src, const char *dest, bool replace);
 
 /*
  * Uses `realpath` from `<stdlib.h>` in `Linux` and `_wfullpath` in `Windows`.
@@ -44,6 +59,88 @@ VX_API void          vx_fs_dir_close(vx_dir_handle handle);
 // TODO: win32 version
 VX_API vx_status vx_fs_which(const char *name, char *out_path, size_t out_size);
 
+VX_API void vx_fs_forbid_path(const char *path);
+
+/*
+ * Checks whether the target path is protected from deletion.
+ * A path is protected if it is equal to, or a parent of, any forbidden path.
+ * This ensures that deleting a protected path or any of its ancestors is blocked,
+ * while children of a protected path remain deletable.
+ *
+ * @param target the resolved absolute path to check.
+ * @return: `true` if the path is protected, `false` otherwise.
+ */
+VX_API bool vx_fs_is_path_protected(const char *target);  // TODO: include win32 in desc
+
+VX_API void vx_fs_log_forbidden_paths(void);
+
 //----------------------------------------------------------------------------------------------------
+
+static inline void vx_clear_term(void)
+{
+    vx_printf("\e[1;1H\e[2J");
+}
+
+static inline bool vx_isdir(const char *path)
+{
+    if (path == NULL)
+    {
+        return false;
+    }
+
+    vx_stat_struct st;
+    return (vx_stat(path, &st) == 0 && S_ISDIR(st.st_mode));
+}
+
+static inline bool vx_isfile(const char *path)
+{
+    FILE *f = fopen(path, "r");
+
+    if (f)
+    {
+        fclose(f);
+        return true;
+    }
+    return false;
+}
+
+/*
+ * Thread local buf
+ */
+static inline const char *vx_getcwd_fn(void)
+{
+    static thread_local char buf[VX_PATH_MAX];
+
+    if (vx_getcwd(buf, sizeof(buf)) == NULL)
+    {
+        return NULL;
+    }
+
+    return buf;
+}
+
+static inline bool vx_fs_is_abspath(const char *path)
+{
+    if (path == nullptr || path[0] == '\0')
+    {
+        return false;
+    }
+
+#if defined(VX_OS_WINDOWS)
+
+    if (isalpha((u8) path[0]) && path[1] == ':')
+    {
+        return path[2] == '\\' || path[2] == '/';
+    }
+
+    if ((path[0] == '\\' && path[1] == '\\') || (path[0] == '/' && path[1] == '/'))
+    {
+        return true;
+    }
+
+#else
+    return path[0] == '/';
+#endif
+}
 
 #endif  // VX_FS_H_

@@ -5,6 +5,7 @@
     #include <io.h>
     #include <direct.h>
     #include <windows.h>
+    #include "vx_defs.h"
 
     #define vx_write       _write
     #define vx_getcwd      _getcwd
@@ -36,6 +37,7 @@ typedef CONDITION_VARIABLE vx_cond;
         #define _GNU_SOURCE
     #endif
 
+    #include "vx_defs.h"
     #include <unistd.h>
     #include <sys/stat.h>
     #include <sys/types.h>
@@ -85,8 +87,6 @@ typedef pthread_cond_t  vx_cond;
         #endif
     #endif
 #endif
-
-VX_API void vx_io_init(void);
 
 VX_API const char *vx_platform_get_cache_dir(void);
 

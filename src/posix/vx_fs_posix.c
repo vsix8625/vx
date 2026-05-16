@@ -1,6 +1,6 @@
 #include "vx_fs.h"
 
-#if defined(VX_OS_LINUX) && defined(VX_USE_THREADS)
+#if defined(VX_OS_LINUX)
 
     #include <stdio.h>
     #include <stdlib.h>
@@ -62,14 +62,17 @@ bool vx_fs_cp(const char *src, const char *dest)
     return sent == st.st_size;
 }
 
-bool vx_fs_ln(const char *src, const char *dest)
+bool vx_fs_ln(const char *src, const char *dest, bool replace)
 {
     if (src == nullptr || dest == nullptr)
     {
         return false;
     }
 
-    unlink(dest);
+    if (replace)
+    {
+        unlink(dest);
+    }
     return link(src, dest) == 0;
 }
 

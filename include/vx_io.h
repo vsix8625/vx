@@ -2,11 +2,7 @@
 #ifndef IO_H_
     #define IO_H_
 
-    #include "vx_defs.h"
-    #include "vx_platform.h"
-
-    #include <sys/stat.h>
-    #include <stdio.h>
+    #include "vx_limits.h"
 
     #define VA_CHECK(fmt_arg_n) __attribute__((format(__printf__, fmt_arg_n, fmt_arg_n + 1)))
 
@@ -46,51 +42,6 @@ VX_API vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
  *                       };
  */
 VX_API void vx_sbuf_append(struct vx_sbuf *buf, const char *fmt, ...) VA_CHECK(2);
-
-//----------------------------------------------------------------------------------------------------
-
-static inline void vx_clear_term(void)
-{
-    vx_printf("\e[1;1H\e[2J");
-}
-
-static inline bool vx_isdir(const char *path)
-{
-    if (path == NULL)
-    {
-        return false;
-    }
-
-    vx_stat_struct st;
-    return (vx_stat(path, &st) == 0 && S_ISDIR(st.st_mode));
-}
-
-static inline bool vx_isfile(const char *path)
-{
-    FILE *f = fopen(path, "r");
-
-    if (f)
-    {
-        fclose(f);
-        return true;
-    }
-    return false;
-}
-
-/*
- * Thread local buf
- */
-static inline const char *vx_getcwd_fn(void)
-{
-    static thread_local char buf[VX_PATH_MAX];
-
-    if (vx_getcwd(buf, sizeof(buf)) == NULL)
-    {
-        return NULL;
-    }
-
-    return buf;
-}
 
 //----------------------------------------------------------------------------------------------------
 

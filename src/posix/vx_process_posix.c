@@ -1,6 +1,6 @@
 #include "vx_process.h"
 
-#if defined(VX_OS_LINUX)
+#if defined(VX_OS_LINUX) && defined(VX_USE_PROCESS)
 
     #include <spawn.h>
     #include <sys/wait.h>

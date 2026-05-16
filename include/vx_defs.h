@@ -5,8 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "vx_limits.h"
-
 typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -76,7 +74,13 @@ typedef struct vx_sbuf
     char pad[8];
 } vx_sbuf;
 
-#define VX_INTERNAL __attribute__((visibility("hidden")))
+#if defined(__GNUC__) || defined(__clang__)
+    #define VX_INTERNAL __attribute__((visibility("hidden")))
+#elif defined(_MSC_VER)
+    #define VX_INTERNAL
+#else
+    #define VX_INTERNAL
+#endif
 
 #if !defined(__cplusplus)
     #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L

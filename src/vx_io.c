@@ -1,6 +1,4 @@
-#include "vx_io.h"
 #include "vx.h"
-#include "vx_util.h"
 
 #include <linux/limits.h>
 #include <stdarg.h>
