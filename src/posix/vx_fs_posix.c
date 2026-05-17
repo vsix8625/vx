@@ -278,4 +278,29 @@ vx_status vx_fs_which(const char *name, char *out_path, size_t out_size)
     return VX_ERROR;
 }
 
+vx_status vx_fs_get_file_metrics(const char *path, u64 *out_size, u64 *out_mtime)
+{
+    if (path == nullptr || out_size == nullptr || out_mtime == nullptr)
+    {
+        return VX_ERROR;
+    }
+
+    vx_stat_struct st;
+
+    if (vx_stat(path, &st) != 0)
+    {
+        return VX_ERROR;
+    }
+
+    if (!S_ISREG(st.st_mode))
+    {
+        return VX_ERROR;
+    }
+
+    *out_size  = (u64) st.st_size;
+    *out_mtime = (u64) st.st_mtime;
+
+    return VX_OK;
+}
+
 #endif

@@ -324,6 +324,27 @@ void vx_fs_dir_close(vx_dir_handle handle)
     vx_free(w);
 }
 
+vx_status vx_fs_get_file_metrics(const char *path, u64 *out_size, u64 *out_mtime)
+{
+    if (path == nullptr || out_size == nullptr || out_mtime == nullptr)
+    {
+        return VX_ERROR;
+    }
+
+    WIN32_FILE_ATTRIBUTE_DATA attr;
+    if (!GetFileAttributesExA(path, GetFileExInfoStandard, &attr))
+    {
+        return VX_ERROR;
+    }
+
+    *out_size = ((u64) attr.nFileSizeHigh << 32) | attr.nFileSizeLow;
+
+    *out_mtime =
+        ((u64) attr.ftLastWriteTime.dwHighDateTime << 32) | attr.ftLastWriteTime.dwLowDateTime;
+
+    return VX_OK;
+}
+
 //----------------------------------------------------------------------------------------------------
 
 #endif

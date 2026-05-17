@@ -67,6 +67,8 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
         return;
     }
 
+    printf("\33[2k\r");
+
     i32 fd = STDOUT_FILENO;
 
     if (type != VX_LEVEL_PRINTF)

@@ -74,6 +74,8 @@ VX_API bool vx_fs_is_path_protected(const char *target);  // TODO: include win32
 
 VX_API void vx_fs_log_forbidden_paths(void);
 
+VX_API vx_status vx_fs_get_file_metrics(const char *path, u64 *out_size, u64 *out_mtime);
+
 //----------------------------------------------------------------------------------------------------
 
 static inline void vx_clear_term(void)
