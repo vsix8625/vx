@@ -50,4 +50,6 @@ VX_API void vx_ticks_start(vx_ticks *t);
  */
 VX_API void vx_ticks_end(vx_ticks *t);
 
+VX_API u64 vx_time_epoch_s(void);
+
 #endif  // VX_TIME_H_

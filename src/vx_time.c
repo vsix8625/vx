@@ -117,3 +117,27 @@ char *vx_ticks_format(const vx_ticks *ticks, char *buf, size_t buf_size)
 
     return buf;
 }
+
+u64 vx_time_epoch_s(void)
+{
+#if defined(VX_OS_WINDOWS)
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+
+    u64 intervals = ((u64) ft.dwHighDateTime << 32) | ft.dwLowDateTime;
+
+    u64 total_seconds = intervals / 10000000ULL;
+
+    u64 unix_seconds = total_seconds - 11644473600ULL;
+
+    return unix_seconds;
+#else
+    struct timespec ts;
+
+    if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
+    {
+        return (u64) ts.tv_sec;
+    }
+    return 0;
+#endif
+}
