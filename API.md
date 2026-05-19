@@ -38,6 +38,7 @@
 | `vx_fs_forbid_path` | — |
 | `vx_fs_is_path_protected` | Checks whether the target path is protected from deletion. A path is protected if it is equal to, or a parent of, any forbidden path. This ensures that deleting a protected path or any of its ancestors is blocked, while children of a protected path remain deletable. @param target the resolved absolute path to check. @return: `true` if the path is protected, `false` otherwise. |
 | `vx_fs_log_forbidden_paths` | — |
+| `vx_fs_get_file_metrics` | — |
 | `vx_clear_term` | — |
 | `vx_isdir` | — |
 | `vx_isfile` | — |
@@ -63,6 +64,8 @@
 | Name | Description |
 |------|-------------|
 | `vx_platform_get_cache_dir` | — |
+| `vx_platform_get_config_dir` | — |
+| `vx_platform_get_home_dir` | — |
 
 ## `vx_process.h`
 
@@ -71,6 +74,7 @@
 | `vx_process_spawn` | @brief Cross-platform process creation abstraction. Spawns a child process while abstracting the underlying OS mechanism (`posix_spawn` on Linux, CreateProcess on Windows). @param proc Pointer to the `vx_process` handle. This stores the platform-specific identity of the process (PID/Handle). @param cmd  The command or executable path. @param args A NULL-terminated array of strings. - On POSIX: Passed directly to `posix_spawnp`. - On Win32: Flattened into a single command line string, as Win32 treats arguments as a single buffer. @param cfg  Configuration block for fine-grained control: - cfg->working_dir: Sets the child's starting directory (CWD). - cfg->flags: - `VX_PROCESS_FLAGS_BG`: Detaches the process from the parent's session/console. - `VX_PROCESS_FLAGS_SILENT`: Discards output (mapped to /dev/null on POSIX or suppressed on Win32). @return `vx_status` `VX_OK` if the OS successfully initialized the process, `VX_ERROR` otherwise. |
 | `vx_process_wait` | — |
 | `vx_process_kill` | — |
+| `vx_process_consume_output` | — |
 
 ## `vx_string.h`
 
@@ -119,6 +123,7 @@
 | `vx_ticks_format` | Converts the duration between the start and end ticks into a human-readable string. Returns a pointer to the provided buffer. |
 | `vx_ticks_start` | Captures high-resolution timestamp and store it as the starting point in a `vx_ticks` structure. Resets the `end` value to 0. |
 | `vx_ticks_end` | Captures high-resolution timestamp and store it as the end point in a `vx_ticks` structure. When paired with a preceding `vx_ticks_start` call, this defines the duration of the profiled code block. |
+| `vx_time_epoch_s` | — |
 
 ## `vx_util.h`
 
@@ -130,7 +135,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (48)
+## ⚠ Undocumented (53)
 
 These declarations have no doc comment yet:
 
@@ -146,6 +151,7 @@ These declarations have no doc comment yet:
 - `vx_fs_dir_open` — *vx_fs.h*
 - `vx_fs_dir_read` — *vx_fs.h*
 - `vx_fs_forbid_path` — *vx_fs.h*
+- `vx_fs_get_file_metrics` — *vx_fs.h*
 - `vx_fs_is_abspath` — *vx_fs.h*
 - `vx_fs_is_dot_dir` — *vx_fs.h*
 - `vx_fs_log_forbidden_paths` — *vx_fs.h*
@@ -162,7 +168,10 @@ These declarations have no doc comment yet:
 - `vx_pathncmp` — *vx_string.h*
 - `vx_pause` — *vx_util.h*
 - `vx_platform_get_cache_dir` — *vx_platform.h*
+- `vx_platform_get_config_dir` — *vx_platform.h*
+- `vx_platform_get_home_dir` — *vx_platform.h*
 - `vx_printf` — *vx_io.h*
+- `vx_process_consume_output` — *vx_process.h*
 - `vx_process_kill` — *vx_process.h*
 - `vx_process_wait` — *vx_process.h*
 - `vx_sem_destroy` — *vx_thread.h*
@@ -179,6 +188,7 @@ These declarations have no doc comment yet:
 - `vx_thread_pool_destroy` — *vx_thread.h*
 - `vx_thread_pool_push` — *vx_thread.h*
 - `vx_thread_pool_wait` — *vx_thread.h*
+- `vx_time_epoch_s` — *vx_time.h*
 - `vx_trim_s` — *vx_util.h*
 - `vx_warn` — *vx_io.h*
 - `vx_yield` — *vx_util.h*

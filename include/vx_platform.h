@@ -41,6 +41,7 @@ typedef CONDITION_VARIABLE vx_cond;
     #include <unistd.h>
     #include <sys/stat.h>
     #include <sys/types.h>
+    #include <pwd.h>
 
     #define vx_write       write
     #define vx_getcwd      getcwd
@@ -63,11 +64,13 @@ typedef pthread_cond_t  vx_cond;
 
 #if defined(_WIN32) || defined(_WIN64)
     #define VX_OS_WINDOWS 1
+    #define VX_OS_NAME    "win32"
 #elif defined(__APPLE__) || defined(__MACH__)
     #define VX_OS_MACOS 1
     #error "macOS not supported"
 #elif defined(__linux__) || defined(__linux)
     #define VX_OS_LINUX 1
+    #define VX_OS_NAME  "linux"
 #else
     #error "Unsupported platform"
 #endif
@@ -91,5 +94,7 @@ typedef pthread_cond_t  vx_cond;
 VX_API const char *vx_platform_get_cache_dir(void);
 
 VX_API const char *vx_platform_get_config_dir(void);
+
+VX_API const char *vx_platform_get_home_dir(void);
 
 #endif  // VX_PLATFORM_H_

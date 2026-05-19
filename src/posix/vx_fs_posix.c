@@ -142,7 +142,7 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 
     if (fd == -1)
     {
-        VX_ASSERT_LOG("Failed to open %s", path);
+        vx_errlog("Failed to open %s", path);
         return result;
     }
 
@@ -150,7 +150,7 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 
     if (fstat(fd, &st) == -1)
     {
-        VX_ASSERT_LOG("fstat failed for %s", path);
+        vx_errlog("fstat failed for %s", path);
         return result;
     }
 
@@ -165,7 +165,7 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 
     if (buf == nullptr)
     {
-        VX_ASSERT_LOG("Failed to allocate for %s", path);
+        vx_errlog("Failed to allocate for %s", path);
         close(fd);
         return result;
     }
@@ -177,7 +177,7 @@ vx_sv vx_fs_read(const char *path, vx_alloc_fn alloc, void *user)
 
         if (n <= 0)
         {
-            VX_ASSERT_LOG("Failed to read %s", path);
+            vx_errlog("Failed to read %s", path);
             close(fd);
 
             if (use_default_alloc)

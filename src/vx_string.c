@@ -43,7 +43,7 @@ void vx_fs_forbid_path(const char *path)
         }
     }
 
-    strncpy(g_vx_fs_forbidden_paths[g_vx_fs_forbidden_count], resolved, VX_PATH_MAX - 1);
+    snprintf(g_vx_fs_forbidden_paths[g_vx_fs_forbidden_count], VX_PATH_MAX, "%s", resolved);
 
     g_vx_fs_forbidden_paths[g_vx_fs_forbidden_count][VX_PATH_MAX - 1] = '\0';
 

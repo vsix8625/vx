@@ -80,7 +80,7 @@ VX_API vx_status vx_fs_get_file_metrics(const char *path, u64 *out_size, u64 *ou
 
 static inline void vx_clear_term(void)
 {
-    vx_printf("\e[1;1H\e[2J");
+    vx_printf("\033[1;1H\033[2J");
 }
 
 static inline bool vx_isdir(const char *path)

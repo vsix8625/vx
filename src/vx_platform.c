@@ -50,3 +50,19 @@ const char *vx_platform_get_config_dir(void)
     return nullptr;
 #endif
 }
+
+const char *vx_platform_get_home_dir(void)
+{
+#if defined(VX_OS_WINDOWS)
+    return getenv("USERPROFILE");
+#else
+    const char *home = getenv("HOME");
+    if (home != nullptr)
+    {
+        return home;
+    }
+
+    struct passwd *pw = getpwuid(getuid());
+    return pw ? pw->pw_dir : nullptr;
+#endif
+}

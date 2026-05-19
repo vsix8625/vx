@@ -13,8 +13,9 @@ typedef enum sx_proc_flags : u8
 {
     VX_PROCESS_FLAGS_NONE = 0,
 
-    VX_PROCESS_FLAGS_BG,
-    VX_PROCESS_FLAGS_SILENT,
+    VX_PROCESS_FLAGS_BG      = 1 << 0,
+    VX_PROCESS_FLAGS_SILENT  = 1 << 1,
+    VX_PROCESS_FLAGS_CAPTURE = 1 << 2,
 } vx_proc_flags;
 
 struct vx_proc_cfg
@@ -36,6 +37,7 @@ struct vx_process
     pid_t pid;
     #endif
 
+    i32  read_pipe_fd;
     i32  exit_code;
     bool running;
 };
@@ -71,6 +73,8 @@ VX_API vx_status vx_process_spawn(struct vx_process  *proc,
 
 VX_API i32  vx_process_wait(struct vx_process *proc);
 VX_API void vx_process_kill(struct vx_process *proc);
+
+VX_API void vx_process_consume_output(struct vx_process *proc, vx_sbuf *thread_local_buf);
 
 #endif
 
