@@ -66,3 +66,12 @@ const char *vx_platform_get_home_dir(void)
     return pw ? pw->pw_dir : nullptr;
 #endif
 }
+
+vx_status vx_platform_setenv(const char *name, const char *value)
+{
+#if defined(VX_OS_WINDOWS)
+    return _putenv_s(name, value) == 0 ? VX_OK : VX_ERROR;
+#else
+    return setenv(name, value, 1) == 0 ? VX_OK : VX_ERROR;
+#endif
+}

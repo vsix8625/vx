@@ -66,6 +66,7 @@
 | `vx_platform_get_cache_dir` | — |
 | `vx_platform_get_config_dir` | — |
 | `vx_platform_get_home_dir` | — |
+| `vx_platform_setenv` | — |
 
 ## `vx_process.h`
 
@@ -135,7 +136,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (53)
+## ⚠ Undocumented (54)
 
 These declarations have no doc comment yet:
 
@@ -170,6 +171,7 @@ These declarations have no doc comment yet:
 - `vx_platform_get_cache_dir` — *vx_platform.h*
 - `vx_platform_get_config_dir` — *vx_platform.h*
 - `vx_platform_get_home_dir` — *vx_platform.h*
+- `vx_platform_setenv` — *vx_platform.h*
 - `vx_printf` — *vx_io.h*
 - `vx_process_consume_output` — *vx_process.h*
 - `vx_process_kill` — *vx_process.h*

@@ -97,4 +97,6 @@ VX_API const char *vx_platform_get_config_dir(void);
 
 VX_API const char *vx_platform_get_home_dir(void);
 
+VX_API vx_status vx_platform_setenv(const char *name, const char *value);
+
 #endif  // VX_PLATFORM_H_
