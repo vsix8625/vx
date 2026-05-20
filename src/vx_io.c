@@ -16,10 +16,10 @@ typedef enum
 } vx_log_type;
 
 static const vx_sv vx_prefix_none  = VX_SV("");
-static const vx_sv vx_prefix_log   = VX_SV("\033[38;5;40m[log]: \033[0m");
-static const vx_sv vx_prefix_warn  = VX_SV("\033[38;5;202m[warning]: \033[0m");
-static const vx_sv vx_prefix_error = VX_SV("\033[38;5;160m[error]: \033[0m");
-static const vx_sv vx_prefix_debug = VX_SV("\033[38;5;167m[debug]: \033[0m");
+static const vx_sv vx_prefix_log   = VX_SV("\033[2K\r\033[38;5;40m[log]: \033[0m");
+static const vx_sv vx_prefix_warn  = VX_SV("\033[2K\r\033[38;5;202m[warning]: \033[0m");
+static const vx_sv vx_prefix_error = VX_SV("\033[2K\r\033[38;5;160m[error]: \033[0m");
+static const vx_sv vx_prefix_debug = VX_SV("\033[2K\r\033[38;5;167m[debug]: \033[0m");
 
 static const vx_sv vx_plain_log   = VX_SV("[log]: ");
 static const vx_sv vx_plain_warn  = VX_SV("[warning]: ");
@@ -66,8 +66,6 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
     {
         return;
     }
-
-    printf("\33[2k\r");
 
     i32 fd = STDOUT_FILENO;
 

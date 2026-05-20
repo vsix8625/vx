@@ -8,6 +8,11 @@ const char *vx_platform_get_cache_dir(void)
 {
     static char cache_path[VX_PATH_MAX];
 
+    if (cache_path[0] != '\0')
+    {
+        return cache_path;
+    }
+
 #if defined(VX_OS_WINDOWS)
     return getenv("LOCALAPPDATA");
 #else

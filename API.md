@@ -20,6 +20,17 @@
 | `vx_array_pop` | Removes and returns the last element of the array. Returns `nullptr` if the array is empty or `nullptr`. |
 | `vx_array_pop_at` | Removes and returns the element at `index`. `NOTE:` This operation does NOT preserve array order. Returns `nullptr` if `index` is out of bounds. |
 
+## `vx_cpu.h`
+
+| Name | Description |
+|------|-------------|
+| `vx_cpu_get_nproc` | — |
+| `vx_cpu_get_cache_line` | — |
+| `vx_cpu_has_avx` | — |
+| `vx_cpu_has_avx2` | — |
+| `vx_cpu_has_sse4_2` | — |
+| `vx_cpu_has_bmi` | — |
+
 ## `vx_fs.h`
 
 | Name | Description |
@@ -136,7 +147,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (54)
+## ⚠ Undocumented (60)
 
 These declarations have no doc comment yet:
 
@@ -145,6 +156,12 @@ These declarations have no doc comment yet:
 - `vx_cond_init` — *vx_thread.h*
 - `vx_cond_signal` — *vx_thread.h*
 - `vx_cond_wait` — *vx_thread.h*
+- `vx_cpu_get_cache_line` — *vx_cpu.h*
+- `vx_cpu_get_nproc` — *vx_cpu.h*
+- `vx_cpu_has_avx` — *vx_cpu.h*
+- `vx_cpu_has_avx2` — *vx_cpu.h*
+- `vx_cpu_has_bmi` — *vx_cpu.h*
+- `vx_cpu_has_sse4_2` — *vx_cpu.h*
 - `vx_dbglog` — *vx_io.h*
 - `vx_errlog` — *vx_io.h*
 - `vx_fs_cp` — *vx_fs.h*
