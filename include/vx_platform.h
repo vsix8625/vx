@@ -24,6 +24,12 @@
     #define VX_PATH_SEP     '\\'
     #define VX_PATH_SEP_STR "\\"
 
+    // Platform Artifact Extensions
+    #define VX_EXE_EXT    ".exe"
+    #define VX_LIB_EXT    ".lib"
+    #define VX_DLL_EXT    ".dll"
+    #define VX_LIB_PREFIX ""
+
 typedef CRITICAL_SECTION   vx_mutex;
 typedef CONDITION_VARIABLE vx_cond;
 
@@ -54,8 +60,14 @@ typedef CONDITION_VARIABLE vx_cond;
     #define VX_PATH_SEP     '/'
     #define VX_PATH_SEP_STR "/"
 
-    #define VX_FILENO fileno
-    #define VX_DEVNUL "/dev/null"
+    #define VX_FILENO     fileno
+    #define VX_DEVNUL     "/dev/null"
+
+    // Platform Artifact Extensions
+    #define VX_EXE_EXT    ""
+    #define VX_LIB_EXT    ".a"
+    #define VX_DLL_EXT    ".so"
+    #define VX_LIB_PREFIX "lib"
 
 typedef pthread_mutex_t vx_mutex;
 typedef pthread_cond_t  vx_cond;

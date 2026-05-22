@@ -109,4 +109,8 @@ typedef struct
 
 typedef void *vx_dir_handle;
 
+#define VX_KiB(x) ((u64) (x) << 10)
+#define VX_MiB(x) ((u64) (x) << 20)
+#define VX_GiB(x) ((u64) (x) << 30)
+
 #endif  // DEFS_H_

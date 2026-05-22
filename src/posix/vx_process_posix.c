@@ -131,7 +131,21 @@ i32 vx_process_wait(struct vx_process *proc)
 
     i32 status;
     waitpid(proc->pid, &status, 0);
-    proc->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
+
+    if (WIFEXITED(status))
+    {
+        proc->exit_code = WEXITSTATUS(status);
+    }
+    else if (WIFSIGNALED(status))
+    {
+        i32 signal_num = WTERMSIG(status);
+
+        proc->exit_code = -signal_num;
+    }
+    else
+    {
+        proc->exit_code = -1;
+    }
 
     proc->running = false;
     return proc->exit_code;
