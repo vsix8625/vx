@@ -55,6 +55,7 @@
 | `vx_isfile` | — |
 | `vx_getcwd_fn` | Thread local buf |
 | `vx_fs_is_abspath` | — |
+| `vx_fs_exists` | — |
 
 ## `vx_io.h`
 
@@ -147,7 +148,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (60)
+## ⚠ Undocumented (61)
 
 These declarations have no doc comment yet:
 
@@ -168,6 +169,7 @@ These declarations have no doc comment yet:
 - `vx_fs_dir_close` — *vx_fs.h*
 - `vx_fs_dir_open` — *vx_fs.h*
 - `vx_fs_dir_read` — *vx_fs.h*
+- `vx_fs_exists` — *vx_fs.h*
 - `vx_fs_forbid_path` — *vx_fs.h*
 - `vx_fs_get_file_metrics` — *vx_fs.h*
 - `vx_fs_is_abspath` — *vx_fs.h*

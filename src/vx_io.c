@@ -270,9 +270,9 @@ vx_status vx_fwrite(const char *path, const char *fmt, ...)
 
     FILE *fp = fopen(path, "w");
 
-    if (!fp)
+    if (fp == nullptr)
     {
-        vx_errlog("Failed to open: %s", path);
+        vx_errlog("%s: Failed to open: %s", __func__, path);
         return VX_ERROR;
     }
 
@@ -301,9 +301,9 @@ vx_status vx_fappend(const char *path, const char *fmt, ...)
 
     FILE *fp = fopen(path, "a");
 
-    if (!fp)
+    if (fp == nullptr)
     {
-        vx_errlog("Failed to open: %s", path);
+        vx_errlog("%s: Failed to open: %s", __func__, path);
         return VX_ERROR;
     }
 

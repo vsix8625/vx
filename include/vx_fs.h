@@ -145,4 +145,14 @@ static inline bool vx_fs_is_abspath(const char *path)
 #endif
 }
 
+static inline bool vx_fs_exists(const char *path)
+{
+    if (!path || path[0] == '\0')
+    {
+        return false;
+    }
+
+    return vx_access(path, VX_F_OK) == 0;
+}
+
 #endif  // VX_FS_H_
