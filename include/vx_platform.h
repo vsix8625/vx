@@ -16,6 +16,7 @@
     #define vx_chdir       _chdir
     #define vx_access      _access
     #define VX_F_OK        0
+    #define VX_X_OK        0
 
     #define STDOUT_FILENO 1
     #define STDERR_FILENO 2
@@ -59,7 +60,8 @@ typedef CONDITION_VARIABLE vx_cond;
     #define vx_chdir       chdir
     #define vx_isatty      isatty
     #define vx_access      access
-    #define VX_F_OK        0
+    #define VX_F_OK        F_OK
+    #define VX_X_OK        X_OK
 
     #define VX_PATH_SEP     '/'
     #define VX_PATH_SEP_STR "/"
