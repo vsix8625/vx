@@ -71,6 +71,7 @@
 | `vx_fwrite` | Write formatted output to a file at `path`. Thread-safe via spinlock. @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written. |
 | `vx_fappend` | Append formatted output to a file at `path`. Thread-safe via spinlock. @return: `VX_OK` on success, `VX_ERROR` if the file could not be opened or written. |
 | `vx_sbuf_append` | `char buf[VX_PATH_MAX];` `vx_sbuf` sbuf = { .data   = buf, .size   = sizeof(buf), .offset = 0 }; |
+| `vx_log_set_level` | — |
 
 ## `vx_platform.h`
 
@@ -149,7 +150,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (62)
+## ⚠ Undocumented (63)
 
 These declarations have no doc comment yet:
 
@@ -182,6 +183,7 @@ These declarations have no doc comment yet:
 - `vx_isdir` — *vx_fs.h*
 - `vx_isfile` — *vx_fs.h*
 - `vx_log` — *vx_io.h*
+- `vx_log_set_level` — *vx_io.h*
 - `vx_mutex_destroy` — *vx_thread.h*
 - `vx_mutex_init` — *vx_thread.h*
 - `vx_mutex_lock` — *vx_thread.h*

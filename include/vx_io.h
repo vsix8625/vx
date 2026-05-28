@@ -43,6 +43,14 @@ VX_API vx_status vx_fappend(const char *path, const char *fmt, ...) VA_CHECK(2);
  */
 VX_API void vx_sbuf_append(struct vx_sbuf *buf, const char *fmt, ...) VA_CHECK(2);
 
+typedef enum
+{
+    VX_LOG_ALL   = 0,
+    VX_LOG_QUIET = 1,
+} vx_log_mode;
+
+VX_API void vx_log_set_level(vx_log_mode mode);
+
 //----------------------------------------------------------------------------------------------------
 
     #define VX_LOAD_CHECK() vx_printf("Hello, from VX\n")

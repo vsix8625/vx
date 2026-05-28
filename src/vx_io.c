@@ -15,6 +15,8 @@ typedef enum
     VX_LEVEL_DEBUG,
 } vx_log_type;
 
+static vx_log_mode g_vx_log_level = VX_LOG_ALL;
+
 static const vx_sv vx_prefix_none  = VX_SV("");
 static const vx_sv vx_prefix_log   = VX_SV("\033[2K\r\033[38;5;40m[log]: \033[0m");
 static const vx_sv vx_prefix_warn  = VX_SV("\033[2K\r\033[38;5;202m[warning]: \033[0m");
@@ -67,11 +69,19 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
         return;
     }
 
+    // Log level
     i32 fd = STDOUT_FILENO;
-
-    if (type != VX_LEVEL_PRINTF)
+    if (type == VX_LEVEL_WARN || type == VX_LEVEL_ERROR)
     {
         fd = STDERR_FILENO;
+    }
+
+    if (g_vx_log_level == VX_LOG_QUIET)
+    {
+        if (type == VX_LEVEL_INFO || type == VX_LEVEL_DEBUG)
+        {
+            return;
+        }
     }
 
     bool use_color = (vx_is_tty(fd) != 0);
@@ -340,4 +350,9 @@ void vx_sbuf_append(vx_sbuf *buf, const char *fmt, ...)
 
         buf->offset += actual_added;
     }
+}
+
+void vx_log_set_level(vx_log_mode mode)
+{
+    g_vx_log_level = mode;
 }
