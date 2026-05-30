@@ -64,13 +64,12 @@ u64 vx_time_ms(void)
 
 f32 vx_time_f32(void)
 {
-    // we use double for division for precision
-    return (f32) ((f64) vx_time_ns() / 1000000000.0);
+    return (f32) ((f64) vx_time_ns() * 0.000000001);
 }
 
 f64 vx_time_f64(void)
 {
-    return (f64) vx_time_ns() / 1000000000.0;
+    return (f64) vx_time_ns() * 0.000000001;
 }
 
 void vx_ticks_start(vx_ticks *t)
@@ -100,19 +99,19 @@ char *vx_ticks_format(const vx_ticks *ticks, char *buf, size_t buf_size)
     }
     else if (diff < 1000000ULL)
     {
-        snprintf(buf, buf_size, "%.2f us", ns / 1000.0);
+        snprintf(buf, buf_size, "%.2f us", ns * 0.001);
     }
     else if (diff < 1000000000ULL)
     {
-        snprintf(buf, buf_size, "%.2f ms", ns / 1000000.0);
+        snprintf(buf, buf_size, "%.2f ms", ns * 0.000001);
     }
     else if (diff < 60000000000ULL)
     {
-        snprintf(buf, buf_size, "%.3f s", ns / 1000000000.0);
+        snprintf(buf, buf_size, "%.3f s", ns * 0.000000001);
     }
     else
     {
-        snprintf(buf, buf_size, "%.2f min", ns / 60000000000.0);
+        snprintf(buf, buf_size, "%.2f min", ns * 1.6666666666666667e-11);
     }
 
     return buf;

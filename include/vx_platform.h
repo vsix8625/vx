@@ -11,8 +11,8 @@
     #define vx_getcwd      _getcwd
     #define vx_mkdir(dir)  _mkdir((dir))
     #define vx_isatty      _isatty
-    #define vx_stat        _stat
-    #define vx_stat_struct struct _stat
+    #define vx_stat        _stat64
+    #define vx_stat_struct struct __stat64
     #define vx_chdir       _chdir
     #define vx_access      _access
     #define VX_F_OK        0

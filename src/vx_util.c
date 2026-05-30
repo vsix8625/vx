@@ -66,7 +66,7 @@ vx_status vx_mkdir_p(const char *path)
         vx_stat_struct st;
         if (vx_stat(tmp, &st) != 0 || !S_ISDIR(st.st_mode))
         {
-            vx_errlog("%s(): mkdir failed at: '%s'", __func__, tmp);
+            vx_errlog("%s: mkdir failed at: '%s'", __func__, tmp);
             return VX_ERROR;
         }
     }

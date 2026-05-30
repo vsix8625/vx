@@ -165,4 +165,20 @@ static inline bool vx_fs_is_exec(const char *path)
     return vx_access(path, VX_X_OK) == 0;
 }
 
+static inline u64 vx_fs_get_file_size(const char *path)
+{
+    if (path == nullptr)
+    {
+        return 0;
+    }
+
+    vx_stat_struct st;
+    if (vx_stat(path, &st) != 0)
+    {
+        return 0;
+    }
+
+    return (u64) st.st_size;
+}
+
 #endif  // VX_FS_H_

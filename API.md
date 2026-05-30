@@ -57,6 +57,7 @@
 | `vx_fs_is_abspath` | — |
 | `vx_fs_exists` | — |
 | `vx_fs_is_exec` | — |
+| `vx_fs_get_file_size` | — |
 
 ## `vx_io.h`
 
@@ -150,7 +151,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (63)
+## ⚠ Undocumented (64)
 
 These declarations have no doc comment yet:
 
@@ -174,6 +175,7 @@ These declarations have no doc comment yet:
 - `vx_fs_exists` — *vx_fs.h*
 - `vx_fs_forbid_path` — *vx_fs.h*
 - `vx_fs_get_file_metrics` — *vx_fs.h*
+- `vx_fs_get_file_size` — *vx_fs.h*
 - `vx_fs_is_abspath` — *vx_fs.h*
 - `vx_fs_is_dot_dir` — *vx_fs.h*
 - `vx_fs_is_exec` — *vx_fs.h*
