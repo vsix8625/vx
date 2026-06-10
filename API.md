@@ -63,6 +63,7 @@
 
 | Name | Description |
 |------|-------------|
+| `vx_io_set_prefix` | @brief Dynamically updates the logger prefix text and color formatting for a specific log level. This function allows the application layer to override the default library prefixes (like '[log]:') with custom strings and standard ANSI terminal colors. @param type   The target logging level (e.g., VX_LEVEL_INFO, VX_LEVEL_WARN, VX_LEVEL_ERROR). @param prefix The new plain-text string literal to display before log messages. @param color  The target terminal color enum (e.g., VX_COLOR_RED, VX_COLOR_GREEN). @note This function is NOT thread-safe. Overwriting prefixes while other threads are logging will cause a data race. @example vx_io_set_prefix(VX_LEVEL_ERROR, "[foo]: ", VX_COLOR_RED); |
 | `vx_printf` | — |
 | `vx_warn` | — |
 | `vx_errlog` | — |

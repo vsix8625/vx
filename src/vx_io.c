@@ -6,27 +6,34 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum
-{
-    VX_LEVEL_PRINTF,
-    VX_LEVEL_INFO,
-    VX_LEVEL_WARN,
-    VX_LEVEL_ERROR,
-    VX_LEVEL_DEBUG,
-} vx_log_type;
+//----------------------------------------------------------------------------------------------------
+
+static char g_vx_color_string_pool[5][128];
+
+static const char *g_ansi_color_codes[] = {[VX_COLOR_NONE]    = "",
+                                           [VX_COLOR_GREEN]   = "38;5;40",
+                                           [VX_COLOR_ORANGE]  = "38;5;202",
+                                           [VX_COLOR_RED]     = "38;5;160",
+                                           [VX_COLOR_CORAL]   = "38;5;167",
+                                           [VX_COLOR_BLUE]    = "38;5;75",
+                                           [VX_COLOR_MAGENTA] = "38;5;13"};
+
+//----------------------------------------------------------------------------------------------------
 
 static vx_log_mode g_vx_log_level = VX_LOG_ALL;
 
-static const vx_sv vx_prefix_none  = VX_SV("");
-static const vx_sv vx_prefix_log   = VX_SV("\033[2K\r\033[38;5;40m[log]: \033[0m");
-static const vx_sv vx_prefix_warn  = VX_SV("\033[2K\r\033[38;5;202m[warning]: \033[0m");
-static const vx_sv vx_prefix_error = VX_SV("\033[2K\r\033[38;5;160m[error]: \033[0m");
-static const vx_sv vx_prefix_debug = VX_SV("\033[2K\r\033[38;5;167m[debug]: \033[0m");
+static vx_sv g_vx_plain_prefixes[5] = {[VX_LOG_LEVEL_PRINTF] = VX_SV(""),
+                                       [VX_LOG_LEVEL_INFO]   = VX_SV("[log]: "),
+                                       [VX_LOG_LEVEL_WARN]   = VX_SV("[warning]: "),
+                                       [VX_LOG_LEVEL_ERROR]  = VX_SV("[error]: "),
+                                       [VX_LOG_LEVEL_DEBUG]  = VX_SV("[debug]: ")};
 
-static const vx_sv vx_plain_log   = VX_SV("[log]: ");
-static const vx_sv vx_plain_warn  = VX_SV("[warning]: ");
-static const vx_sv vx_plain_error = VX_SV("[error]: ");
-static const vx_sv vx_plain_debug = VX_SV("[debug]: ");
+static vx_sv g_vx_color_prefixes[5] = {
+    [VX_LOG_LEVEL_PRINTF] = VX_SV(""),
+    [VX_LOG_LEVEL_INFO]   = VX_SV("\033[2K\r\033[38;5;40m[log]: \033[0m"),
+    [VX_LOG_LEVEL_WARN]   = VX_SV("\033[2K\r\033[38;5;202m[warning]: \033[0m"),
+    [VX_LOG_LEVEL_ERROR]  = VX_SV("\033[2K\r\033[38;5;160m[error]: \033[0m"),
+    [VX_LOG_LEVEL_DEBUG]  = VX_SV("\033[2K\r\033[38;5;167m[debug]: \033[0m")};
 
 static atomic_flag g_io_atomic_lock     = ATOMIC_FLAG_INIT;
 static atomic_flag g_fwrite_atomic_lock = ATOMIC_FLAG_INIT;
@@ -50,7 +57,7 @@ static inline bool vx_is_tty(i32 fd)
 
     if (fd == STDERR_FILENO)
     {
-        if (g_stdout_tty == -1)
+        if (g_stderr_tty == -1)
         {
             g_stderr_tty = vx_isatty(fd);
             return g_stderr_tty;
@@ -71,14 +78,14 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 
     // Log level
     i32 fd = STDOUT_FILENO;
-    if (type == VX_LEVEL_WARN || type == VX_LEVEL_ERROR)
+    if (type == VX_LOG_LEVEL_WARN || type == VX_LOG_LEVEL_ERROR)
     {
         fd = STDERR_FILENO;
     }
 
     if (g_vx_log_level == VX_LOG_QUIET)
     {
-        if (type == VX_LEVEL_INFO || type == VX_LEVEL_DEBUG)
+        if (type == VX_LOG_LEVEL_INFO || type == VX_LOG_LEVEL_DEBUG)
         {
             return;
         }
@@ -86,75 +93,7 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 
     bool use_color = (vx_is_tty(fd) != 0);
 
-    vx_sv prefix = vx_prefix_none;
-    if (use_color)
-    {
-        switch (type)
-        {
-            case VX_LEVEL_INFO:
-            {
-                prefix = vx_prefix_log;
-                break;
-            }
-
-            case VX_LEVEL_WARN:
-            {
-                prefix = vx_prefix_warn;
-                break;
-            }
-
-            case VX_LEVEL_ERROR:
-            {
-                prefix = vx_prefix_error;
-                break;
-            }
-
-            case VX_LEVEL_DEBUG:
-            {
-                prefix = vx_prefix_debug;
-                break;
-            }
-
-            default:
-            {
-                break;
-            }
-        }
-    }
-    else
-    {
-        switch (type)
-        {
-            case VX_LEVEL_INFO:
-            {
-                prefix = vx_plain_log;
-                break;
-            }
-
-            case VX_LEVEL_WARN:
-            {
-                prefix = vx_plain_warn;
-                break;
-            }
-
-            case VX_LEVEL_ERROR:
-            {
-                prefix = vx_plain_error;
-                break;
-            }
-
-            case VX_LEVEL_DEBUG:
-            {
-                prefix = vx_plain_debug;
-                break;
-            }
-
-            default:
-            {
-                break;
-            }
-        }
-    }
+    vx_sv prefix = use_color ? g_vx_color_prefixes[type] : g_vx_plain_prefixes[type];
 
     // end of setup
 
@@ -170,7 +109,7 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 
     if (total_len < sizeof(buf) - 1)
     {
-        if (type != VX_LEVEL_PRINTF)
+        if (type != VX_LOG_LEVEL_PRINTF)
         {
             buf[total_len++] = '\n';
         }
@@ -194,7 +133,7 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
             vsnprintf(big + prefix.len, (size_t) msg_len + 1, fmt, aq_heap);
             va_end(aq_heap);
 
-            if (type != VX_LEVEL_PRINTF)
+            if (type != VX_LOG_LEVEL_PRINTF)
             {
                 big[total_len] = '\n';
                 total_len++;
@@ -211,7 +150,7 @@ void vx_printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vx_log_core(VX_LEVEL_PRINTF, fmt, args);
+    vx_log_core(VX_LOG_LEVEL_PRINTF, fmt, args);
     va_end(args);
 }
 
@@ -219,7 +158,7 @@ void vx_warn(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vx_log_core(VX_LEVEL_WARN, fmt, args);
+    vx_log_core(VX_LOG_LEVEL_WARN, fmt, args);
     va_end(args);
 }
 
@@ -227,7 +166,7 @@ void vx_errlog(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vx_log_core(VX_LEVEL_ERROR, fmt, args);
+    vx_log_core(VX_LOG_LEVEL_ERROR, fmt, args);
     va_end(args);
 }
 
@@ -235,7 +174,7 @@ void vx_log(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vx_log_core(VX_LEVEL_INFO, fmt, args);
+    vx_log_core(VX_LOG_LEVEL_INFO, fmt, args);
     va_end(args);
 }
 
@@ -255,7 +194,7 @@ void vx_dbglog(const char *fmt, ...)
 
     va_list args;
     va_start(args, fmt);
-    vx_log_core(VX_LEVEL_DEBUG, fmt, args);
+    vx_log_core(VX_LOG_LEVEL_DEBUG, fmt, args);
     va_end(args);
 }
 
@@ -355,4 +294,43 @@ void vx_sbuf_append(vx_sbuf *buf, const char *fmt, ...)
 void vx_log_set_level(vx_log_mode mode)
 {
     g_vx_log_level = mode;
+}
+
+//----------------------------------------------------------------------------------------------------
+
+void vx_io_set_prefix(vx_log_type type, const char *prefix, vx_color color)
+{
+    if (type < VX_LOG_LEVEL_INFO || type > VX_LOG_LEVEL_DEBUG || prefix == nullptr)
+    {
+        return;
+    }
+
+    g_vx_plain_prefixes[type] = vx_sv_from_cstr(prefix);
+
+    if (color != VX_COLOR_NONE && color < (sizeof(g_ansi_color_codes) / sizeof(char *)))
+    {
+        char temp_buf[128];
+
+        i32 len = snprintf(temp_buf,
+                           sizeof(temp_buf),
+                           "\033[2K\r\033[%sm%s\033[0m",
+                           g_ansi_color_codes[color],
+                           prefix);
+
+        if (len > 0 && (size_t) len < sizeof(temp_buf))
+        {
+            memcpy(g_vx_color_string_pool[type], temp_buf, (size_t) len + 1);
+
+            g_vx_color_prefixes[type].data = g_vx_color_string_pool[type];
+            g_vx_color_prefixes[type].len  = (size_t) len;
+        }
+        else
+        {
+            g_vx_color_prefixes[type] = g_vx_plain_prefixes[type];
+        }
+    }
+    else
+    {
+        g_vx_color_prefixes[type] = g_vx_plain_prefixes[type];
+    }
 }

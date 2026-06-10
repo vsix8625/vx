@@ -6,6 +6,26 @@
 
     #define VA_CHECK(fmt_arg_n) __attribute__((format(__printf__, fmt_arg_n, fmt_arg_n + 1)))
 
+/**
+ * @brief Dynamically updates the logger prefix text and color formatting for a specific log level.
+ *
+ * This function allows the application layer to override the default library prefixes
+ * (like `'[log]:'`) with custom strings and standard ANSI terminal colors.
+ *
+ * @param type   The target logging level (e.g., `VX_LEVEL_INFO`, `VX_LEVEL_WARN`,
+ * `VX_LEVEL_ERROR`).
+ * @param prefix A null-terminated string to display before log messages.
+ *               The pointer must remain valid for the lifetime of the logger.
+ * @param color  The target terminal color enum (e.g., `VX_COLOR_RED`, `VX_COLOR_GREEN`).
+ *
+ * @note This function is NOT thread-safe. Overwriting prefixes while other threads are logging
+ * will cause a data race.
+ *
+ * @example
+ * vx_io_set_prefix(VX_LEVEL_ERROR, "[foo]: ", VX_COLOR_RED);
+ */
+VX_API void vx_io_set_prefix(vx_log_type type, const char *prefix, vx_color color);
+
 VX_API void vx_printf(const char *fmt, ...) VA_CHECK(1);
 VX_API void vx_warn(const char *fmt, ...) VA_CHECK(1);
 VX_API void vx_errlog(const char *fmt, ...) VA_CHECK(1);

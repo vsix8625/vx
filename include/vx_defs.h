@@ -113,4 +113,24 @@ typedef void *vx_dir_handle;
 #define VX_MiB(x) ((u64) (x) << 20)
 #define VX_GiB(x) ((u64) (x) << 30)
 
+typedef enum
+{
+    VX_LOG_LEVEL_PRINTF,
+    VX_LOG_LEVEL_INFO,
+    VX_LOG_LEVEL_WARN,
+    VX_LOG_LEVEL_ERROR,
+    VX_LOG_LEVEL_DEBUG,
+} vx_log_type;
+
+typedef enum
+{
+    VX_COLOR_NONE,
+    VX_COLOR_GREEN,
+    VX_COLOR_ORANGE,
+    VX_COLOR_RED,
+    VX_COLOR_CORAL,    // 167 (debug color)
+    VX_COLOR_BLUE,     // 75  (Vibrant cornflower blue)
+    VX_COLOR_MAGENTA,  // 13  (Bright magenta)
+} vx_color;
+
 #endif  // DEFS_H_
