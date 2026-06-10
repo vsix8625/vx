@@ -7,7 +7,9 @@ i32 vx_pathncmp(const char *s1, const char *s2, size_t n)
 {
 #if defined(VX_OS_WINDOWS)
     return VX_CAST(i32, _strnicmp(s1, s2, n));
-#elif defined(VX_OS_LINUX)
+#elif defined(VX_OS_MACOS)
+    return VX_CAST(i32, strncasecmp(s1, s2, n));
+#else
     return VX_CAST(i32, strncmp(s1, s2, n));
 #endif
 }

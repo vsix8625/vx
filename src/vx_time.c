@@ -11,7 +11,7 @@
 static u64 g_vx_time_start = 0;
 
 #if defined(VX_OS_WINDOWS)
-static uint64_t g_vx_ticks_freq = 0;
+static u64 g_vx_ticks_freq = 0;
 #elif defined(VX_OS_MACOS)
 static mach_timebase_info_data_t g_vx_timebase_info;
 #endif
@@ -26,7 +26,7 @@ static u64 vx_get_system_ns(void)
            (u64) (counter.QuadPart % g_vx_ticks_freq) * 1000000000ULL / g_vx_ticks_freq;
 #elif defined(VX_OS_MACOS)
     u64 now = mach_absolute_time();
-    return (now * g_vx_timebase_info.numer) / g_vx_timebase_info.denom;
+    return (u64) ((unsigned __int128) now * g_vx_timebase_info.numer) / g_vx_timebase_info.denom;
 #else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

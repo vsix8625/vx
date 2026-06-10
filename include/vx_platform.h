@@ -2,6 +2,17 @@
 #define VX_PLATFORM_H_
 
 #if defined(_WIN32) || defined(_WIN64)
+    #define VX_OS_WINDOWS 1
+    #define VX_OS_NAME    "win32"
+#elif defined(__MACH__) || defined(__APPLE__)
+    #define VX_OS_MACOS 1
+    #define VX_OS_NAME  "macos"
+#else
+    #define VX_OS_LINUX 1
+    #define VX_OS_NAME  "linux"
+#endif
+
+#if defined(VX_OS_WINDOWS)
     #include <io.h>
     #include <direct.h>
     #include <windows.h>
@@ -72,25 +83,17 @@ typedef CONDITION_VARIABLE vx_cond;
     // Platform Artifact Extensions
     #define VX_EXE_EXT    ""
     #define VX_LIB_EXT    ".a"
-    #define VX_DLL_EXT    ".so"
     #define VX_LIB_PREFIX "lib"
+
+    #if defined(VX_OS_MACOS)
+        #define VX_DLL_EXT ".dylib"
+    #else
+        #define VX_DLL_EXT ".so"
+    #endif
 
 typedef pthread_mutex_t vx_mutex;
 typedef pthread_cond_t  vx_cond;
 
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-    #define VX_OS_WINDOWS 1
-    #define VX_OS_NAME    "win32"
-#elif defined(__APPLE__) || defined(__MACH__)
-    #define VX_OS_MACOS 1
-    #error "macOS not supported"
-#elif defined(__linux__) || defined(__linux)
-    #define VX_OS_LINUX 1
-    #define VX_OS_NAME  "linux"
-#else
-    #error "Unsupported platform"
 #endif
 
 #ifndef VX_API
@@ -110,11 +113,8 @@ typedef pthread_cond_t  vx_cond;
 #endif
 
 VX_API const char *vx_platform_get_cache_dir(void);
-
 VX_API const char *vx_platform_get_config_dir(void);
-
 VX_API const char *vx_platform_get_home_dir(void);
-
-VX_API vx_status vx_platform_setenv(const char *name, const char *value);
+VX_API vx_status   vx_platform_setenv(const char *name, const char *value);
 
 #endif  // VX_PLATFORM_H_
