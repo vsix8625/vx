@@ -63,7 +63,7 @@
 
 | Name | Description |
 |------|-------------|
-| `vx_io_set_prefix` | @brief Dynamically updates the logger prefix text and color formatting for a specific log level. This function allows the application layer to override the default library prefixes (like '[log]:') with custom strings and standard ANSI terminal colors. @param type   The target logging level (e.g., VX_LEVEL_INFO, VX_LEVEL_WARN, VX_LEVEL_ERROR). @param prefix The new plain-text string literal to display before log messages. @param color  The target terminal color enum (e.g., VX_COLOR_RED, VX_COLOR_GREEN). @note This function is NOT thread-safe. Overwriting prefixes while other threads are logging will cause a data race. @example vx_io_set_prefix(VX_LEVEL_ERROR, "[foo]: ", VX_COLOR_RED); |
+| `vx_io_set_prefix` | @brief Dynamically updates the logger prefix text and color formatting for a specific log level. This function allows the application layer to override the default library prefixes (like `'[log]:'`) with custom strings and standard ANSI terminal colors. @param type   The target logging level (e.g., `VX_LEVEL_INFO`, `VX_LEVEL_WARN`, `VX_LEVEL_ERROR`). @param prefix A null-terminated string to display before log messages. The pointer must remain valid for the lifetime of the logger. @param color  The target terminal color enum (e.g., `VX_COLOR_RED`, `VX_COLOR_GREEN`). @note This function is NOT thread-safe. Overwriting prefixes while other threads are logging will cause a data race. @example vx_io_set_prefix(VX_LEVEL_ERROR, "[foo]: ", VX_COLOR_RED); |
 | `vx_printf` | — |
 | `vx_warn` | — |
 | `vx_errlog` | — |
@@ -82,6 +82,7 @@
 | `vx_platform_get_cache_dir` | — |
 | `vx_platform_get_config_dir` | — |
 | `vx_platform_get_home_dir` | — |
+| `vx_platform_get_self_exe` | — |
 | `vx_platform_setenv` | — |
 
 ## `vx_process.h`
@@ -152,7 +153,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (64)
+## ⚠ Undocumented (65)
 
 These declarations have no doc comment yet:
 
@@ -197,6 +198,7 @@ These declarations have no doc comment yet:
 - `vx_platform_get_cache_dir` — *vx_platform.h*
 - `vx_platform_get_config_dir` — *vx_platform.h*
 - `vx_platform_get_home_dir` — *vx_platform.h*
+- `vx_platform_get_self_exe` — *vx_platform.h*
 - `vx_platform_setenv` — *vx_platform.h*
 - `vx_printf` — *vx_io.h*
 - `vx_process_consume_output` — *vx_process.h*

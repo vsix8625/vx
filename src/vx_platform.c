@@ -102,3 +102,41 @@ vx_status vx_platform_setenv(const char *name, const char *value)
     return setenv(name, value, 1) == 0 ? VX_OK : VX_ERROR;
 #endif
 }
+
+vx_status vx_platform_get_self_exe(char *out_buf, u32 buf_size)
+{
+    if (out_buf == nullptr || buf_size == 0)
+    {
+        return VX_ERROR;
+    }
+
+#if defined(VX_OS_WINDOWS)
+
+    DWORD len = GetModuleFileNameA(NULL, out_buf, (DWORD) buf_size);
+
+    if (len == 0 || len >= (DWORD) buf_size)
+    {
+        return VX_ERROR;
+    }
+
+#elif defined(VX_OS_MACOS)
+
+    u32 size = (u32) buf_size;
+    if (_NSGetExecutablePath(out_buf, &size) != 0)
+    {
+        return VX_ERROR;
+    }
+
+#else
+
+    ssize_t len = readlink("/proc/self/exe", out_buf, (size_t) (buf_size - 1));
+    if (len == -1)
+    {
+        return VX_ERROR;
+    }
+    out_buf[len] = '\0';
+
+#endif
+
+    return VX_OK;
+}
