@@ -1,17 +1,15 @@
 #include "vx_fs.h"
 
-#if defined(VX_OS_LINUX)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/sendfile.h>
+#include <ftw.h>
 
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <dirent.h>
-    #include <fcntl.h>
-    #include <sys/sendfile.h>
-    #include <ftw.h>
-
-    #include "vx_string.h"
-    #include "vx_util.h"
+#include "vx_string.h"
+#include "vx_util.h"
 
 bool vx_fs_mv(const char *src, const char *dest)
 {
@@ -53,13 +51,20 @@ bool vx_fs_cp(const char *src, const char *dest)
         return false;
     }
 
+#if defined(VX_OS_MACOS)
+    off_t len = st.st_size;
+    sendfile(src_fd, dest_fd, 0, &len, NULL, 0);
+    bool result = (len == st.st_size);
+#else
     off_t   offset = 0;
     ssize_t sent   = sendfile(dest_fd, src_fd, &offset, st.st_size);
+    bool    result = (sent == st.st_size);
+#endif
 
     close(src_fd);
     close(dest_fd);
 
-    return sent == st.st_size;
+    return result;
 }
 
 bool vx_fs_ln(const char *src, const char *dest, bool replace)
@@ -302,5 +307,3 @@ vx_status vx_fs_get_file_metrics(const char *path, u64 *out_size, u64 *out_mtime
 
     return VX_OK;
 }
-
-#endif

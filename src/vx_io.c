@@ -97,7 +97,7 @@ static void vx_log_core(vx_log_type type, const char *fmt, va_list args)
 
     // end of setup
 
-    char buf[PATH_MAX];
+    char buf[VX_BUF_SIZE_4096];
     memcpy(buf, prefix.data, prefix.len);
 
     va_list aq;
@@ -222,6 +222,7 @@ vx_status vx_fwrite(const char *path, const char *fmt, ...)
     if (fp == nullptr)
     {
         vx_errlog("%s: Failed to open: %s", __func__, path);
+        atomic_flag_clear(&g_fwrite_atomic_lock);
         return VX_ERROR;
     }
 
@@ -253,6 +254,7 @@ vx_status vx_fappend(const char *path, const char *fmt, ...)
     if (fp == nullptr)
     {
         vx_errlog("%s: Failed to open: %s", __func__, path);
+        atomic_flag_clear(&g_fwrite_atomic_lock);
         return VX_ERROR;
     }
 

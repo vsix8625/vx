@@ -7,6 +7,7 @@
 //----------------------------------------------------------------------------------------------------
 
 static vx_status vx_job_queue_init(struct vx_job_queue *q, u32 size);
+
 static vx_status vx_job_queue_push(struct vx_job_queue *q, vx_thread_fn fn, void *arg);
 static vx_status vx_job_queue_pop(struct vx_job_queue *q, struct vx_job *job);
 static void      vx_job_queue_destroy(struct vx_job_queue *q);

@@ -14,6 +14,9 @@
 
     #if defined(VX_OS_WINDOWS)
 typedef HANDLE vx_sem;
+    #elif defined(VX_OS_MACOS)
+        #include <semaphore.h>
+typedef sem_t *vx_sem;
     #else
         #include <semaphore.h>
 typedef sem_t vx_sem;
@@ -75,6 +78,11 @@ VX_API void      vx_thread_detach(struct vx_thread *t);
 VX_API u64       vx_thread_id(void);
 
 VX_API vx_status vx_thread_pool_create(struct vx_thread_pool *pool, u32 thread_count, u32 queue_size);
+
+/*
+ * NOTE: vx_thread_pool_push is NOT thread-safe for concurrent pushers.
+ * Jobs must be pushed from a single thread only.
+ */
 VX_API vx_status vx_thread_pool_push(struct vx_thread_pool *pool, vx_thread_fn fn, void *arg);
 VX_API vx_status vx_thread_pool_wait(struct vx_thread_pool *pool);
 VX_API void      vx_thread_pool_destroy(struct vx_thread_pool *pool);

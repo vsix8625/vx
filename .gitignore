@@ -4,6 +4,9 @@
 .barr/
 build/
 Barrfile
+.storm/
+Stormfile
+crater/
 
 # Object files
 *.o

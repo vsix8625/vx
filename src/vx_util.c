@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined(__linux__)
+#if !defined(VX_OS_WINDOWS)
     #include <time.h>
 #endif
 

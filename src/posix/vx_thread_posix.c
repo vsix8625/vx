@@ -1,6 +1,6 @@
 #include "vx_thread.h"
 
-#if defined(VX_OS_LINUX) && defined(VX_USE_THREADS)
+#if defined(VX_USE_THREADS)
 
     #include <pthread.h>
 
@@ -60,7 +60,17 @@ void vx_thread_detach(struct vx_thread *t)
 
 u64 vx_thread_id(void)
 {
+    #if defined(VX_OS_MACOS)
+
+    u64 tid;
+    pthread_threadid_np(NULL, &tid);
+    return tid;
+
+    #else
+
     return (u64) pthread_self();
+
+    #endif
 }
 
 void vx_mutex_init(vx_mutex *m)

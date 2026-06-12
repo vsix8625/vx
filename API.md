@@ -113,7 +113,7 @@
 | `vx_thread_detach` | — |
 | `vx_thread_id` | — |
 | `vx_thread_pool_create` | — |
-| `vx_thread_pool_push` | — |
+| `vx_thread_pool_push` | NOTE: vx_thread_pool_push is NOT thread-safe for concurrent pushers. Jobs must be pushed from a single thread only. |
 | `vx_thread_pool_wait` | — |
 | `vx_thread_pool_destroy` | — |
 | `vx_sem_init` | — |
@@ -153,7 +153,7 @@
 | `vx_pause` | — |
 
 ---
-## ⚠ Undocumented (65)
+## ⚠ Undocumented (64)
 
 These declarations have no doc comment yet:
 
@@ -216,7 +216,6 @@ These declarations have no doc comment yet:
 - `vx_thread_join` — *vx_thread.h*
 - `vx_thread_pool_create` — *vx_thread.h*
 - `vx_thread_pool_destroy` — *vx_thread.h*
-- `vx_thread_pool_push` — *vx_thread.h*
 - `vx_thread_pool_wait` — *vx_thread.h*
 - `vx_time_epoch_s` — *vx_time.h*
 - `vx_trim_s` — *vx_util.h*

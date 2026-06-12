@@ -133,4 +133,29 @@ typedef enum
     VX_COLOR_MAGENTA,  // 13  (Bright magenta)
 } vx_color;
 
+typedef struct vx_vec2
+{
+    i32 x, y;
+} vx_vec2;
+
+typedef struct vx_vec2f
+{
+    f32 x, y;
+} vx_vec2f;
+
+typedef struct vx_vec4f
+{
+    union
+    {
+        struct
+        {
+            f32 x, y, z, w;
+        };
+        struct
+        {
+            f32 r, g, b, a;
+        };
+    };
+} vx_vec4f;
+
 #endif  // DEFS_H_

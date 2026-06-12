@@ -87,6 +87,7 @@ typedef CONDITION_VARIABLE vx_cond;
 
     #if defined(VX_OS_MACOS)
         #define VX_DLL_EXT ".dylib"
+        #include <mach-o/dyld.h>
     #else
         #define VX_DLL_EXT ".so"
     #endif

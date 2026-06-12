@@ -25,6 +25,37 @@ void vx_sem_destroy(vx_sem *sem)
     CloseHandle(*sem);
 }
 
+    #elif defined(VX_OS_MACOS)
+i32 vx_sem_init(vx_sem *sem, u32 initial_count)
+{
+    static atomic_uint counter = 0;
+
+    u32 id = atomic_fetch_add(&counter, 1);
+
+    char name[32];
+    snprintf(name, sizeof(name), "/vx_sem_%u", id);
+    *sem = sem_open(name, O_CREAT | O_EXCL, 0600, initial_count);
+    if (*sem == SEM_FAILED)
+    {
+        return -1;
+    }
+    sem_unlink(name);  // unlink immediately, stays alive until sem_close
+    return 0;
+}
+void vx_sem_wait(vx_sem *sem)
+{
+    while (sem_wait(*sem) == -1 && errno == EINTR)
+        ;
+}
+void vx_sem_post(vx_sem *sem)
+{
+    sem_post(*sem);
+}
+void vx_sem_destroy(vx_sem *sem)
+{
+    sem_close(*sem);
+}
+
     #else
 
         #include <errno.h>

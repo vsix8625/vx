@@ -79,8 +79,29 @@ bool vx_fs_is_path_protected(const char *target)
 
 #if defined(VX_OS_WINDOWS)
     const char *defaults[] = {"C:\\Windows", "C:\\Users", nullptr};
+#elif defined(VX_OS_MACOS)
+    const char *defaults[] = {
+        "/", "/etc", "/usr", "/bin", "/sbin", "/System", "/Library", "/private", nullptr};
 #else
-    const char *defaults[] = {"/", "/etc", "/usr", "/bin", "/boot", nullptr};
+    const char *defaults[] = {"/",
+                              "/etc",
+                              "/usr",
+                              "/usr/bin",
+                              "/usr/lib",
+                              "/usr/include",
+                              "/usr/local",
+                              "/usr/share",
+                              "/usr/src",
+                              "/bin",
+                              "/boot",
+                              "/boot/EFI",
+                              "/boot/grub",
+                              "/lib",
+                              "/lib64",
+                              "/proc",
+                              "/sys",
+                              "/dev",
+                              nullptr};
 #endif
 
     for (u32 i = 0; defaults[i]; ++i)
